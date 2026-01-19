@@ -5,28 +5,21 @@ use App\Http\Controllers\PipelineController;
 use App\Http\Controllers\PipelineTemplateController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\TeamController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// mock
 Route::get('/', function () {
-    return view('teams.index');
+    if (auth()->check()) {
+        return view('index');
+    }
+    return view('index');
 });
 
-Route::get('/teams', function () {
-    return view('teams.index');
-})->name('teams.index');
-
-Route::get('/users', function () {
-    return view('users.index');
-})->name('users.index');
-
-Route::get('/users/create', function () { return view('users.create'); })->name('users.create');
-Route::get('/users/edit-mock', function () { return view('users.edit'); })->name('users.edit');
-// end mock
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
@@ -45,11 +38,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/pipeline-templates/select', [PipelineTemplateController::class, 'select'])->name('pipeline-templates.select');
     Route::resource('pipeline-templates', PipelineTemplateController::class);
 });
+    // Sales -> Customer Management
+    Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
 
-Route::middleware('auth')->group(function () {
+    // Profile Management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Manager
+    Route::middleware(['role:manager'])->group(function () {
+
+        // Team Management
+        Route::resource('teams', TeamController::class);
+
+        // Custom Routes
+        Route::post('/teams/{team}/members', [TeamController::class, 'addMember'])->name('teams.add_member');
+        Route::delete('/teams/members/{user}', [TeamController::class, 'removeMember'])->name('teams.remove_member');
+
+        // User Management (Sales Management)
+        Route::resource('users', UserController::class)->except(['show']);
+    });
+
 });
 
 require __DIR__.'/auth.php';

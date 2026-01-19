@@ -9,13 +9,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Team extends Model
 {
-    protected $fillable = ['name', 'template_id'];
+    protected $fillable = ['name', 'template_id',
+        'team_id'
+    ];
 
     public function pipelineTemplate(): BelongsTo {
         return $this->belongsTo(PipelineTemplate::class, 'template_id');
     }
 
-    public function users(): HasMany {
+    public function members(): HasMany {
         return $this->hasMany(User::class);
     }
 

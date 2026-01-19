@@ -47,4 +47,14 @@ class User extends Authenticatable
     public function organization(): BelongsTo {
         return $this->belongsTo(Organization::class);
     }
+
+    public function isManager(): bool
+    {
+        return $this->role === 'manager';
+    }
+
+    public function isSales(): bool
+    {
+        return $this->role === 'sales';
+    }
 }

@@ -27,8 +27,14 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+        $user = $request->user();
+        $user->update(['last_login' => now()]);
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        if ($user->role === 'manager') {
+            return redirect()->intended(route('teams.index'));
+        }
+
+        return redirect()->intended(route('teams.index'));
     }
 
     /**
