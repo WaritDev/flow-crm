@@ -13,8 +13,12 @@
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
+                <a href="{{ route('customers.create') }}" class="p-2 rounded-lg hover:bg-white hover:shadow-sm text-slate-500 transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                </a>
                 เพิ่มลูกค้าใหม่
             </button>
+
 
         </div>
 

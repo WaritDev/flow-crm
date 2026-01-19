@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\PipelineTemplate;
 use App\Models\Team;
+use App\Models\Organization;
 
 class TeamSeeder extends Seeder
 {
@@ -15,7 +16,8 @@ class TeamSeeder extends Seeder
     public function run(): void
     {
         $template = PipelineTemplate::first();
-        Team::create(['name' => 'ทีมขายกรุงเทพ', 'template_id' => $template->id]);
-        Team::create(['name' => 'ทีมขายออนไลน์', 'template_id' => $template->id]);
+        $org = Organization::first();
+        Team::create(['organization_id' => $org->id, 'name' => 'ทีมขายกรุงเทพ', 'template_id' => $template->id]);
+        Team::create(['organization_id' => $org->id, 'name' => 'ทีมขายออนไลน์', 'template_id' => $template->id]);
     }
 }

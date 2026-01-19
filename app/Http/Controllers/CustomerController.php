@@ -33,7 +33,7 @@ class CustomerController extends Controller
             'name' => 'required',
         ]);
 
-        return redirect()->route('customers.index');
+        return redirect()->route('customers');
     }
 
     /**

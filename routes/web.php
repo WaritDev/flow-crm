@@ -26,6 +26,8 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/customers', [CustomerController::class, 'index'])->name('customers');
+Route::get('/customers/create', [CustomerController::class, 'create'])->name('customers.create');
+Route::resource('customers', CustomerController::class);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

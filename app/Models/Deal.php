@@ -37,4 +37,8 @@ class Deal extends Model
     public function activities(): HasMany {
         return $this->hasMany(Activity::class);
     }
+
+    public function organization(): BelongsTo {
+        return $this->belongsTo(Organization::class);
+    }
 }

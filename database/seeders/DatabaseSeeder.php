@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(PipelineTemplateSeeder::class);
+        $this->call(OrganizationSeeder::class);
         $this->call(TeamSeeder::class);
         $this->call(UserSeeder::class);
         $this->call(CustomerSeeder::class);

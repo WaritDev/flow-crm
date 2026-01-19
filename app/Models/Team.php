@@ -18,4 +18,8 @@ class Team extends Model
     public function users(): HasMany {
         return $this->hasMany(User::class);
     }
+
+    public function organization(): BelongsTo {
+        return $this->belongsTo(Organization::class);
+    }
 }

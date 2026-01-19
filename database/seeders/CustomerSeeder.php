@@ -20,6 +20,7 @@ class CustomerSeeder extends Seeder
         foreach ($users as $user) {
             for ($i = 0; $i < 5; $i++) {
                 Customer::create([
+                    'organization_id' => $user->organization_id,
                     'team_id' => $user->team_id,
                     'user_id' => $user->id,
                     'name' => fake()->name(),

@@ -43,4 +43,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(Deal::class);
     }
+
+    public function organization(): BelongsTo {
+        return $this->belongsTo(Organization::class);
+    }
 }

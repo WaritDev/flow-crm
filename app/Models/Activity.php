@@ -23,4 +23,8 @@ class Activity extends Model
     public function customer(): BelongsTo {
         return $this->belongsTo(Customer::class);
     }
+
+    public function organization(): BelongsTo {
+        return $this->belongsTo(Organization::class);
+    }
 }
