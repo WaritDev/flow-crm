@@ -9,13 +9,11 @@
                 <p class="text-slate-500 mt-1">ลูกค้าทั้งหมด 4 ราย</p>
             </div>
 
-            <button class="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-lg shadow-slate-900/20">
+
+            <button onclick="window.location='{{ route('customers.create') }}'" class="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-lg shadow-slate-900/20">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
-                <a href="{{ route('customers.create') }}" class="p-2 rounded-lg hover:bg-white hover:shadow-sm text-slate-500 transition-all">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                </a>
                 เพิ่มลูกค้าใหม่
             </button>
 
