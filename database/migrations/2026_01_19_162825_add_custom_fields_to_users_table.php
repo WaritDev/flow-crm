@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreignId('team_id')->nullable()->constrained('teams')->onDelete('set null');
+            $table->enum('role', ['manager', 'sales'])->default('sales');
+            $table->string('img_url')->nullable();
+            $table->timestamp('last_login')->nullable();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign(['team_id']);
+            $table->dropColumn(['team_id', 'role', 'img_url', 'last_login']);
+        });
+    }
+};

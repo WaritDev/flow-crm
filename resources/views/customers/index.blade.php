@@ -1,9 +1,9 @@
-@extends('layouts.main')
+@extends('layouts.app')
 
 @section('content')
-    <section class="mx-10 mt-5">
-        <h1 class="text-3xl mb-5">
-            Add New Artist
-        </h1>
-    </section>
+
+<div>
+  <h1>Customers</h1>
+</div>
+
 @endsection

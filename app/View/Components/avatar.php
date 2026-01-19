@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class ui.input extends Component
+class avatar extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class ui.input extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.ui.input');
+        return view('components.avatar');
     }
 }
