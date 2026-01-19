@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Team;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\PipelineTemplate;
+use App\Models\Team;
 
 class TeamSeeder extends Seeder
 {
@@ -12,15 +14,8 @@ class TeamSeeder extends Seeder
      */
     public function run(): void
     {
-        $teams = [
-            ['name' => 'Team Alpha (Sales)'],
-            ['name' => 'Team Beta (Enterprise)'],
-            ['name' => 'Team Charlie (Support)'],
-            ['name' => 'Team Delta (Marketing)'],
-        ];
-
-        foreach ($teams as $team) {
-            Team::create($team);
-        }
+        $template = PipelineTemplate::first();
+        Team::create(['name' => 'ทีมขายกรุงเทพ', 'template_id' => $template->id]);
+        Team::create(['name' => 'ทีมขายออนไลน์', 'template_id' => $template->id]);
     }
 }

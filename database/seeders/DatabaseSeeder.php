@@ -15,24 +15,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            TeamSeeder::class,
-        ]);
-
-        User::factory()->create([
-            'name' => 'Manager',
-            'email' => 'manager@flowcrm.com',
-            'password'=> bcrypt('password'),
-            'role' => 'manager',
-            'team_id' => null,
-        ]);
-
-        User::factory()->create([
-            'name' => 'Sales Rep',
-            'email' => 'sales@flowcrm.com',
-            'password'=> bcrypt('password'),
-            'role' => 'sales',
-            'team_id' => 1,
-        ]);
+        $this->call(PipelineTemplateSeeder::class);
+        $this->call(TeamSeeder::class);
+        $this->call(UserSeeder::class);
+        $this->call(CustomerSeeder::class);
+        $this->call(DealSeeder::class);
+        $this->call(ActivitySeeder::class);
+        $this->call(LineScriptSeeder::class);
     }
 }

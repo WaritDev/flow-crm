@@ -20,6 +20,7 @@ class CustomerController extends Controller
     public function create()
     {
         //
+        return view('customers.create');
     }
 
     /**
@@ -28,6 +29,11 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
         //
+        $request->validate([
+            'name' => 'required',
+        ]);
+
+        return redirect()->route('customers.index');
     }
 
     /**
