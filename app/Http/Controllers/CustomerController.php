@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class CustomerController extends Controller
 {
@@ -29,44 +31,32 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-        // validate
         $request->validate([
             'fullname' => 'required|string|max:255',
-            'nickname' => 'nullable|string|max:100', // DB: nullable
-            'phone'    => 'nullable|string|max:20',  // DB: nullable
-            'line_id'  => 'nullable|string|max:100', // DB: nullable
-            'email'    => 'nullable|email|max:255',
-            'province' => 'nullable|string|max:100',
-            'address'  => 'nullable|string',
-            // รูปภาพ validate เป็นไฟล์รูป
-            'avatar'   => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'line_id'  => 'required|string|max:100',
+            'avatar'   => 'nullable|image|max:2048',
         ]);
 
-        $data = [
-            'user_id'     => Auth::id(),
-            'team_id'     => Auth::user()->current_team_id ?? 1, // กรณีใช้ Jetstream Teams หรือกำหนด Default team
+        $customer = new Customer();
 
-            // Text Fields
-            'name'        => $request->fullname,    // Form: fullname -> DB: name
-            'nickname'    => $request->nickname,
-            'phone_num'   => $request->phone,       // Form: phone -> DB: phone_num
-            'line_id'     => $request->line_id,
-            'email'       => $request->email,
-            'province'    => $request->province,
-            'address'     => $request->address,
-
-            // Logic Conversion
-            // Form ส่งมาเป็น on/null -> แปลงเป็น active/inactive
-            'status'      => $request->boolean('is_active') ? 'active' : 'inactive',
-        ];
+        $customer->team_id     = Auth::user()->current_team_id ?? 1;
+        $customer->user_id     = Auth::id();
+        $customer->name        = $request->fullname;
+        $customer->nickname    = $request->nickname;
+        $customer->phone_num   = $request->phone;
+        $customer->email       = $request->email;
+        $customer->line_id     = $request->line_id;
+        $customer->province    = $request->province;
+        $customer->address     = $request->address;
+        $customer->tags        = $request->tags;
+        $customer->status      = $request->boolean('is_active') ? 'active' : 'inactive';
 
         if ($request->hasFile('avatar')) {
-            // save ลง storage/app/public/customers
             $path = $request->file('avatar')->store('customers', 'public');
-            $data['img_profile'] = $path; // DB: img_profile
+            $customer->img_profile = $path;
         }
 
-        Customer::create($data);
+        $customer->save();
 
         return redirect()->route('customers.index')
             ->with('success', 'เพิ่มลูกค้าใหม่เรียบร้อยแล้ว');
@@ -85,15 +75,30 @@ class CustomerController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $customer = Customer::findOrFail($id);
+        return view('customers.edit', compact('customer'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Customer $customer)
     {
-        //
+        $request->validate([
+            'fullname' => 'required|string|max:255',
+            'line_id' => 'required|string|max:100',
+        ]);
+
+        $data = $this->mapCustomerData($request); // ใช้ตัวกรองเดียวกัน
+
+        if ($request->hasFile('avatar')) {
+            if ($customer->img_profile) Storage::disk('public')->delete($customer->img_profile);
+            $data['img_profile'] = $request->file('avatar')->store('customers', 'public');
+        }
+
+        $customer->update($data);
+
+        return redirect()->route('customers.index')->with('success', 'แก้ไขสำเร็จ');
     }
 
     /**
@@ -102,5 +107,22 @@ class CustomerController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    private function mapCustomerData($request)
+    {
+        return [
+            'team_id' => Auth::user()->current_team_id ?? 1,
+            'user_id' => Auth::id(),
+            'name' => $request->fullname,
+            'nickname' => $request->nickname,
+            'phone_num' => $request->phone,
+            'line_id' => $request->line_id,
+            'email' => $request->email,
+            'province' => $request->province,
+            'address' => $request->address,
+            'tags' => $request->tags,
+            'status' => $request->boolean('is_active') ? 'active' : 'inactive',
+        ];
     }
 }

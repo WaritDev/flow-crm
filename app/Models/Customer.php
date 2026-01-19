@@ -28,4 +28,15 @@ class Customer extends Model
     public function organization(): BelongsTo {
         return $this->belongsTo(Organization::class);
     }
+
+    protected $casts = [
+        'tags' => 'array',
+        'is_active' => 'boolean',
+    ];
+
+    protected $attributes = [
+        'is_active' => false,
+        'tags' => [],
+        'img_profile' => null,
+    ];
 }

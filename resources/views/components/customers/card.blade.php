@@ -17,10 +17,17 @@
                 <x-ui.badge :status="$status" />
             </div>
             <p class="text-sm text-slate-500 mt-0.5">{{ $name }}</p>
-            <p class="text-sm text-slate-400 mt-2 flex items-center gap-1">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                {{ $handle }}
-            </p>
+
+            @if(!empty($tags))
+                <div class="flex flex-wrap gap-1 mt-2">
+                    @foreach(array_slice($tags, 0, 2) as $tag) {{-- โชว์แค่ 2 อันแรกป้องกันล้น --}}
+                    <span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">#{{ $tag }}</span>
+                    @endforeach
+                    @if(count($tags) > 2)
+                        <span class="text-[10px] text-slate-400">+{{ count($tags) - 2 }}</span>
+                    @endif
+                </div>
+            @endif
         </div>
     </div>
 
