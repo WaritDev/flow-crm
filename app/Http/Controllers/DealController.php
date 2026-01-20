@@ -165,7 +165,6 @@ class DealController extends Controller
     public function update(Request $request, Deal $deal)
     {
         Gate::authorize('update', $deal);
-        // Validation handled simpler here for brevity, matching store logic
         $request->validate([
             'name' => 'required',
             'value' => 'required',
@@ -185,13 +184,9 @@ class DealController extends Controller
         if ($request->stage === 'lost') {
             $data['lost_reason'] = $request->lost_reason;
             $data['lost_at'] = $deal->lost_at ?? now();
-            // Don't change stage_id if it's already set to a valid stage, just mark as lost
-            // OR if strictly enforcing, keep current stage_id
         } else {
             $stage = PipelineStage::find($request->stage);
             $stageId = $request->stage;
-
-            // Clear Lost/Won state if moving back to normal stage
             $data['lost_at'] = null;
             $data['lost_reason'] = null;
             $data['won_at'] = null;
@@ -205,7 +200,7 @@ class DealController extends Controller
 
         $deal->update($data);
 
-        return redirect()->route('pipeline-stages.index'); // Updated redirect to board
+        return redirect()->route('pipeline-stages.index');
     }
     /**
      * Remove the specified resource from storage.

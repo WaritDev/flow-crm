@@ -31,11 +31,13 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    public function team(): BelongsTo {
+    public function team(): BelongsTo
+    {
         return $this->belongsTo(Team::class);
     }
 
-    public function customers(): HasMany {
+    public function customers(): HasMany
+    {
         return $this->hasMany(Customer::class);
     }
 
@@ -44,7 +46,8 @@ class User extends Authenticatable
         return $this->hasMany(Deal::class);
     }
 
-    public function organization(): BelongsTo {
+    public function organization(): BelongsTo
+    {
         return $this->belongsTo(Organization::class);
     }
 
@@ -58,7 +61,8 @@ class User extends Authenticatable
         return $this->role === 'sales';
     }
 
-    public function getTeamId(): string {
+    public function getTeamId(): ?string
+    {
         return $this->team_id;
     }
 }

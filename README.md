@@ -1,59 +1,129 @@
+# FlowCRM: An Action-Driven CRM for Thai SMEs
+
+**FlowCRM** เป็นระบบบริหารจัดการความสัมพันธ์ลูกค้าที่ออกแบบภายใต้ปรัชญา **"สั่งการ มากกว่า บันทึก"** เพื่อแก้ปัญหาหลักของ SME ไทย เช่น ความเหนื่อยล้าจากการป้อนข้อมูล (Data Entry Fatigue) และช่องว่างของการไม่ปฏิบัติงาน (Inaction Gap)  โดยเปลี่ยนฐานข้อมูลให้กลายเป็นระบบนำทางกิจกรรมรายวัน (Action Stream) ที่เชื่อมต่อกับพฤติกรรมการขายผ่าน LINE OA เป็นหลัก 
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## About The Project
 
-## About Laravel
+FlowCRM พัฒนาขึ้นโดยใช้เฟรมเวิร์ก Laravel ซึ่งเป็นเว็บแอปพลิเคชันเฟรมเวิร์กที่มีไวยากรณ์ที่แสดงออกถึงความหมายและสง่างาม เราเชื่อว่าการพัฒนาต้องเป็นประสบการณ์ที่สนุกสนานและสร้างสรรค์ Laravel ช่วยลดความยุ่งยากในงานทั่วไป เช่น:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+-(https://laravel.com/docs/routing)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+* [Powerful dependency injection container](https://laravel.com/docs/container)
+-([https://laravel.com/docs/eloquent](https://laravel.com/docs/eloquent))
+-([https://laravel.com/docs/migrations](https://laravel.com/docs/migrations))
+-([https://laravel.com/docs/broadcasting](https://laravel.com/docs/broadcasting))
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## System Architecture (สถาปัตยกรรมระบบ)
 
-## Learning Laravel
+ระบบถูกออกแบบมาให้รองรับการขยายตัวแบบ Multi-tenant SaaS และทำงานแบบ Event-Driven :
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+* **Front-end:** React + Vite + Tailwind CSS เพื่อประสิทธิภาพการแสดงผลที่รวดเร็ว
+* **Back-end:** Laravel 11 (REST API) จัดการ Business Logic และการแยกข้อมูลรายร้านค้า (Data Isolation)
+* **Workflow Engine:** **n8n** ทำหน้าที่เป็นสมองกลคอยรับ Webhook จาก LINE OA และแปลงสัญญาณพฤติกรรมลูกค้าให้กลายเป็นกิจกรรมในระบบอัตโนมัติ 
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-## Laravel Sponsors
+* **Data Layer:** PostgreSQL (ฐานข้อมูลหลัก)
+* **Services:** Docker สำหรับการจัดการสภาพแวดล้อม และ Mailpit สำหรับทดสอบระบบอีเมล
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Getting Started (ขั้นตอนการติดตั้ง)
 
-### Premium Partners
+### 1. Prerequisites
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+* ติดตั้ง([https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/))
+* (สำหรับ Windows) แนะนำให้รันผ่าน WSL2
 
-## Contributing
+### 2. Installation
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+ทำการ Clone โปรเจกต์และเตรียมสภาพแวดล้อมดังนี้:
 
-## Code of Conduct
+```bash
+# Clone Github project
+git clone https://github.com/WaritDev/flow-crm.git
+cd flow-crm
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# สร้างไฟล์.env จากตัวอย่าง
+cp.env.example.env
 
-## Security Vulnerabilities
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**แก้ไขไฟล์ `.env**` กำหนดค่าพื้นฐานสำหรับการพัฒนา (Development):
+
+```env
+PHP_CLI_SERVER_WORKERS=4
+LOG_CHANNEL=daily
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=lab_laravel
+DB_USERNAME=sail
+DB_PASSWORD=password
+
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit
+MAIL_PORT=1025
+
+REDIS_HOST=redis
+
+```
+
+### 3. Install Dependencies & Start Services
+
+ติดตั้งคอมโพเนนต์ที่จำเป็นและรันตู้คอนเทนเนอร์:
+
+```bash
+# ติดตั้ง PHP Dependencies (Composer) ผ่าน Docker
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v "$(pwd):/app" \
+    -w /app \
+    composer:latest \
+    install --ignore-platform-reqs
+
+# รัน Services ทั้งหมดด้วย Laravel Sail
+./vendor/bin/sail up -d
+
+# ติดตั้ง Front-end Dependencies และรัน Dev Server
+./vendor/bin/sail npm install
+./vendor/bin/sail npm run dev
+
+```
+
+### 4. Application Initialization
+
+ตั้งค่ากุญแจความปลอดภัยและเตรียมฐานข้อมูลพร้อมข้อมูลตัวอย่าง (Seeder):
+
+```bash
+# สร้าง APP_KEY
+./vendor/bin/sail artisan key:generate
+
+# Migration พร้อม Seed ข้อมูลตัวอย่าง (Manager, Sales, Templates, Deals)
+./vendor/bin/sail artisan migrate:refresh --seed
+
+```
+
+## Access Information (ข้อมูลการเข้าใช้งาน)
+
+เมื่อรันระบบเสร็จสิ้น สามารถเข้าใช้งานได้ที่: `http://localhost`
+
+**บัญชีสำหรับทดสอบ (Default Credentials):**
+
+* **Manager:** `manager@thaicrm.com` / `password`
+* **Sales:** `sales1@thaicrm.com` / `password`
+
+## Key Features for Demo
+
+* **Action Stream:** ดูรายการงานที่ระบบสั่งการให้ทำในแต่ละวัน 
+
+
+* **Sales Pipeline:** กระดาน Kanban แบบ Sequential ที่เน้นความต่อเนื่องของดีล 
+
+
+* **LINE Integration:** ปุ่ม Copy Script และ Deep Link เพื่อเปิดห้องแชทลูกค้าทันที 
+
+
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The FlowCRM project is open-sourced software licensed under the([https://opensource.org/licenses/MIT](https://opensource.org/licenses/MIT)).

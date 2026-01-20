@@ -7,21 +7,24 @@
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Sales Pipeline</h1>
                 <p class="text-slate-500 mt-1">
-                    มูลค่ารวม <span class="font-bold text-slate-800">฿{{ number_format(collect($deals)->sum('value')) }}</span>
+                    มูลค่ารวม <span
+                        class="font-bold text-slate-800">฿{{ number_format(collect($deals)->sum('value')) }}</span>
                 </p>
             </div>
 
             <div class="flex items-center gap-3">
-                <button onclick="window.location='{{ route('pipeline-stages.create') }}'"
+                @can('create', App\Models\PipelineStage::class)
+                    <button onclick="window.location='{{ route('pipeline-stages.create') }}'"
                         class="px-4 py-2.5 rounded-lg border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center gap-2">
-                    <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    เพิ่ม Stage
-                </button>
+                        <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        เพิ่ม Stage
+                    </button>
+                @endcan
 
                 <button onclick="window.location='{{ route('deals.create') }}'"
-                        class="bg-slate-900 text-white px-5 py-2.5 rounded-lg hover:bg-slate-800 flex items-center gap-2 shadow-lg shadow-slate-900/20 transition-all font-medium">
+                    class="bg-slate-900 text-white px-5 py-2.5 rounded-lg hover:bg-slate-800 flex items-center gap-2 shadow-lg shadow-slate-900/20 transition-all font-medium">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
@@ -39,14 +42,14 @@
         </div>
 
         <div x-show="showToast" x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="translate-y-2 opacity-0" x-transition:enter-end="translate-y-0 opacity-100"
-             x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0"
-             class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-xl flex items-center gap-3 z-50"
-             style="display: none;">
+            x-transition:enter-start="translate-y-2 opacity-0" x-transition:enter-end="translate-y-0 opacity-100"
+            x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-xl flex items-center gap-3 z-50"
+            style="display: none;">
             <svg class="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 8v4m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    d="M12 8v4m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <span x-text="toastMessage"></span>
         </div>
@@ -71,7 +74,7 @@
                 },
 
                 dragOver(event, targetIndex) {
-                    if (targetIndex >= this.sourceStageIndex) {}
+                    if (targetIndex >= this.sourceStageIndex) { }
                 },
 
                 isInvalidDrop(targetIndex) {
