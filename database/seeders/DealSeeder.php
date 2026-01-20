@@ -29,6 +29,8 @@ class DealSeeder extends Seeder
                     'team_id' => $customer->team_id,
                     'stage_id' => $stage->id,
                     'next_action' => fake()->randomElement($actions),
+                    'value' => fake()->randomNumber(5, true),
+                    'expected_close_date' => fake()->dateTimeBetween('-1 month', '+1 month')->format('Y-m-d'),
                 ]
             );
         }

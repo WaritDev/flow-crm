@@ -17,9 +17,13 @@ class PipelineTemplateSeeder extends Seeder
             ['name' => 'Default Pipeline',]
         );
 
-        $stages = [['name' => 'ลีดใหม่ (New Lead)', 'position' => 1, 'is_won' => false],
-            ['name' => 'เจรจา/ยื่นกู้ (Negotiation)', 'position' => 3, 'is_won' => false],
-            ['name' => 'ดีลหลุด (Lost)', 'position' => 5, 'is_won' => false]];
+        $stages = [
+            ['name' => 'สนใจ (Prospect)', 'position' => 1, 'is_won' => false],
+            ['name' => 'ติดต่อแล้ว (Contacted)', 'position' => 2, 'is_won' => false],
+            ['name' => 'เสนอราคา (Quoted)', 'position' => 3, 'is_won' => false],
+            ['name' => 'เจรจาต่อรอง (Negotiation)', 'position' => 4, 'is_won' => false],
+            ['name' => 'ปิดการขาย (Won)', 'position' => 5, 'is_won' => true],
+        ];
 
         foreach ($stages as $stage) {
             $template->stages()->create($stage);

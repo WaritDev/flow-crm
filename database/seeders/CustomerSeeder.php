@@ -27,7 +27,8 @@ class CustomerSeeder extends Seeder
                     'nickname' => fake()->firstName(), // ชื่อเล่นคนไทย
                     'line_id' => 'line_'.fake()->userName(),
                     'province' => fake()->randomElement($provinces),
-                    'status' => 'active'
+                    'status' => 'active',
+//                    'tags' => ''
                 ]);
             }
         }
