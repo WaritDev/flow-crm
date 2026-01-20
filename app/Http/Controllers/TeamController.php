@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Organization;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -10,19 +11,26 @@ class TeamController extends Controller
 {
     public function index()
     {
-        $teams = Team::with('members')->latest()->get();
-        $availableUsers = User::whereNull('team_id')
-            ->where('role', 'sales')
-            ->get();
+        $organizations = Organization::all();
+        $teams = Team::with(['members', 'organization'])->get();
+        $availableUsers = User::whereNull('team_id')->where('role', 'sales')->get();
 
-        return view('teams.index', compact('teams', 'availableUsers'));
+        return view('teams.index', compact('teams', 'availableUsers', 'organizations'));
     }
 
     public function store(Request $request)
     {
-        $request->validate(['name' => 'required|string|max:255']);
-        Team::create(['name' => $request->name]);
-        return back()->with('success', 'Team created successfully!');
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'organization_id' => 'required|exists:organizations,id',
+        ]);
+
+        Team::create([
+            'name' => $request->name,
+            'organization_id' => $request->organization_id,
+        ]);
+
+        return back()->with('success', 'Team created successfully.');
     }
 
     public function destroy(Team $team)

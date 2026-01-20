@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Team;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 
 class UserController extends Controller
@@ -29,10 +30,25 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[\p{L}]+(\s+[\p{L}]+)+$/u'
+            ],
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email:rfc,dns',
+                'max:255',
+                'unique:'.User::class
+            ],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'team_id' => ['nullable', 'exists:teams,id'],
+        ], [
+            'name.regex' => 'The name must contain only letters and follow the "First Last" format.',
+            'email.email' => 'The email address is invalid or the domain does not exist.',
         ]);
 
         User::create([
@@ -56,10 +72,25 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[\p{L}]+(\s+[\p{L}]+)+$/u'
+            ],
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email:rfc,dns',
+                'max:255',
+                Rule::unique('users')->ignore($user->id)
+            ],
             'team_id' => ['nullable', 'exists:teams,id'],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'name.regex' => 'The name must contain only letters and follow the "First Last" format.',
+            'email.email' => 'The email address is invalid or the domain does not exist.',
         ]);
 
         $user->name = $request->name;

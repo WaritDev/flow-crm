@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Team extends Model
 {
     protected $fillable = ['name', 'template_id',
-        'team_id'
+        'team_id', 'organization_id'
     ];
 
     public function pipelineTemplate(): BelongsTo {
