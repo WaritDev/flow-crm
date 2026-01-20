@@ -4,7 +4,7 @@
     <div class="flex h-16 items-center px-4 border-b border-slate-800/50 bg-slate-900/50 backdrop-blur-sm"
          :class="sidebarCollapsed ? 'justify-center' : 'justify-between'">
 
-        <a href="" class="flex items-center gap-3 overflow-hidden whitespace-nowrap group" x-show="!sidebarCollapsed">
+        <a href="{{ url('/') }}" class="flex items-center gap-3 overflow-hidden whitespace-nowrap group" x-show="!sidebarCollapsed">
             <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
                 <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
