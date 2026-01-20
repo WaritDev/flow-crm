@@ -12,16 +12,8 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    if (auth()->check()) {
-        return view('index');
-    }
     return view('index');
 });
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
@@ -43,7 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 //    Route::get('/activities/create', [ActivityController::class, 'create'])->name('activities.create');
 //    Route::get('/activities/{id}/edit', [ActivityController::class, 'edit'])->name('activities.edit');
     Route::resource('activities', ActivityController::class);
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
     // Sales -> Customer Management
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
@@ -66,7 +58,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // User Management (Sales Management)
         Route::resource('users', UserController::class)->except(['show']);
     });
-
-});
 
 require __DIR__.'/auth.php';
