@@ -17,10 +17,19 @@
                 <p class="text-sm text-slate-500">Create teams and assign sales members.</p>
             </div>
 
-            <form action="{{ route('teams.store') }}" method="POST" class="flex items-center gap-2 w-full md:w-auto">
+            <form action="{{ route('teams.store') }}" method="POST" class="flex flex-col md:flex-row items-center gap-2 w-full md:w-auto">
                 @csrf
+
+                <select name="organization_id" required class="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm w-full md:w-48 cursor-pointer bg-white text-slate-700">
+                    <option value="">Select Organization...</option>
+                    @foreach($organizations as $org)
+                        <option value="{{ $org->id }}">{{ $org->name }}</option>
+                    @endforeach
+                </select>
+
                 <input type="text" name="name" placeholder="New Team Name..." required class="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm w-full md:w-64 placeholder-slate-400">
-                <button type="submit" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 text-sm font-medium whitespace-nowrap shadow-sm transition-all focus:ring-4 focus:ring-emerald-500/20">
+
+                <button type="submit" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 text-sm font-medium whitespace-nowrap shadow-sm transition-all focus:ring-4 focus:ring-emerald-500/20 w-full md:w-auto">
                     + Create Team
                 </button>
             </form>
