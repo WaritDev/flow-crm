@@ -11,6 +11,52 @@ class DashboardController extends Controller
      */
     public function index()
     {
+//        $isManager = request('view') === 'manager' || (auth()->check() && auth()->user()->role === 'manager');
+        $isManager = request('view') === 'manager';
+
+        if ($isManager) {
+            return $this->managerDashboard();
+        } else {
+            return $this->salesDashboard();
+        }
+    }
+
+    private function managerDashboard()
+    {
+        $stats = [
+            'total_revenue' => 1250000,
+            'target_achievement' => 78, // %
+            'active_deals' => 45,
+            'avg_conversion' => 15.5,
+        ];
+
+        // กราฟเปรียบเทียบยอดขายรายคน
+        $teamPerformance = [
+            'labels' => ['คุณสมชาย', 'คุณวิภา', 'คุณนก', 'คุณมานพ'],
+            'data' => [450000, 320000, 280000, 150000],
+            'targets' => [500000, 300000, 300000, 300000]
+        ];
+
+        // Pipeline รวมของทั้งทีม
+        $pipelineSummary = [
+            ['stage' => 'Prospect', 'count' => 15, 'value' => 500000],
+            ['stage' => 'Contacted', 'count' => 12, 'value' => 350000],
+            ['stage' => 'Quoted', 'count' => 8, 'value' => 800000],
+            ['stage' => 'Negotiation', 'count' => 5, 'value' => 1200000],
+        ];
+
+        // 3 อันดับ Top Sales
+        $topPerformers = [
+            ['name' => 'คุณสมชาย', 'amount' => 450000, 'avatar' => 'S'],
+            ['name' => 'คุณวิภา', 'amount' => 320000, 'avatar' => 'W'],
+            ['name' => 'คุณนก', 'amount' => 280000, 'avatar' => 'N'],
+        ];
+
+        return view('dashboard.manager', compact('stats', 'teamPerformance', 'pipelineSummary', 'topPerformers'));
+    }
+
+    private function salesDashboard()
+    {
         // 1. Mock Top Stats
         $stats = [
             'todo_today' => 8,
@@ -67,7 +113,7 @@ class DashboardController extends Controller
             'projected' => [120000, 155000, 230000, 320000, 350000, 410000, 450000]
         ];
 
-        return view('dashboard.index', compact('stats', 'activities', 'chartData'));
+        return view('dashboard.sales', compact('stats', 'activities', 'chartData'));
     }
 
     /**
