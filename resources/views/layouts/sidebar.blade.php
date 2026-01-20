@@ -71,6 +71,18 @@
                 </span>
             </a>
 
+            <a href="{{ route('activities.index') }}"
+               class="group relative flex items-center gap-3 rounded-xl px-3 py-3 {{ request()->routeIs('pipeline-templates.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} transition-all duration-200">
+                <svg class="h-6 w-6 shrink-0 group-hover:text-emerald-400 transition-colors" fill="none"
+                     stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
+                </svg>
+                <span x-show="!sidebarCollapsed" class="font-medium whitespace-nowrap transition-opacity duration-200">
+                    Activities
+                </span>
+            </a>
+
             <a href="{{ route('pipelines.index') }}"
                class="group relative flex items-center gap-3 rounded-xl px-3 py-3 {{ request()->routeIs('pipelines.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} transition-all duration-200">
                 <svg class="h-6 w-6 shrink-0 group-hover:text-emerald-400 transition-colors" fill="none"

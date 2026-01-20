@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\DealController;
 use App\Http\Controllers\PipelineController;
 use App\Http\Controllers\PipelineTemplateController;
@@ -37,6 +38,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 //    Route::get('/pipelines-templates/create', [PipelineTemplateController::class, 'create'])->name('pipelines.create');
     Route::post('/pipeline-templates/select', [PipelineTemplateController::class, 'select'])->name('pipeline-templates.select');
     Route::resource('pipeline-templates', PipelineTemplateController::class);
+    Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
+//    Route::get('/activities/create', [ActivityController::class, 'create'])->name('activities.create');
+//    Route::get('/activities/{id}/edit', [ActivityController::class, 'edit'])->name('activities.edit');
+    Route::resource('activities', ActivityController::class);
 });
     // Sales -> Customer Management
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
