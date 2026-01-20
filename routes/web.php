@@ -35,7 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 //    Route::get('/activities/create', [ActivityController::class, 'create'])->name('activities.create');
 //    Route::get('/activities/{id}/edit', [ActivityController::class, 'edit'])->name('activities.edit');
     Route::resource('activities', ActivityController::class);
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 });
     // Sales -> Customer Management
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');

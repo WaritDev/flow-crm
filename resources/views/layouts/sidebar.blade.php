@@ -59,10 +59,8 @@
                 </span>
             </a>
 
-        @else
-
-            <a href="{{ route('dashboard') }}"
-               class="group relative flex items-center gap-3 rounded-xl px-3 py-3 {{ request()->routeIs('dashboard') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} transition-all duration-200">
+            <a href="{{ route('dashboard.index') }}"
+               class="group relative flex items-center gap-3 rounded-xl px-3 py-3 {{ request()->routeIs('dashboard.index') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} transition-all duration-200">
                 <svg class="h-6 w-6 shrink-0 group-hover:text-cyan-400 transition-colors" fill="none"
                      stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -85,8 +83,8 @@
                 </span>
             </a>
 
-            <a href="{{ route('pipelines.index') }}"
-               class="group relative flex items-center gap-3 rounded-xl px-3 py-3 {{ request()->routeIs('pipelines.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} transition-all duration-200">
+            <a href="{{ route('pipeline-stages.index') }}"
+               class="group relative flex items-center gap-3 rounded-xl px-3 py-3 {{ request()->routeIs('pipeline-stages.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} transition-all duration-200">
                 <svg class="h-6 w-6 shrink-0 group-hover:text-emerald-400 transition-colors" fill="none"
                      stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -122,6 +120,68 @@
             </a>
 
         @endif
+            @if(auth()->user()->isSales())
+                <a href="{{ route('dashboard') }}"
+                   class="group relative flex items-center gap-3 rounded-xl px-3 py-3 {{ request()->routeIs('dashboard') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} transition-all duration-200">
+                    <svg class="h-6 w-6 shrink-0 group-hover:text-cyan-400 transition-colors" fill="none"
+                         stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                    </svg>
+                    <span x-show="!sidebarCollapsed" class="font-medium whitespace-nowrap transition-opacity duration-200">
+                    Dashboard
+                </span>
+                </a>
+
+                <a href="{{ route('customers.index') }}"
+                   class="group relative flex items-center gap-3 rounded-xl px-3 py-3 {{ request()->routeIs('customers.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} transition-all duration-200">
+                    <svg class="h-6 w-6 shrink-0 group-hover:text-emerald-400 transition-colors" fill="none"
+                         stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    <span x-show="!sidebarCollapsed" class="font-medium whitespace-nowrap transition-opacity duration-200">
+                    Customers
+                </span>
+                </a>
+
+                <a href="{{ route('pipeline-stages.index') }}"
+                   class="group relative flex items-center gap-3 rounded-xl px-3 py-3 {{ request()->routeIs('pipeline-stages.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} transition-all duration-200">
+                    <svg class="h-6 w-6 shrink-0 group-hover:text-emerald-400 transition-colors" fill="none"
+                         stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path>
+                    </svg>
+                    <span x-show="!sidebarCollapsed" class="font-medium whitespace-nowrap transition-opacity duration-200">
+                    Pipeline
+                </span>
+                </a>
+
+                <a href="{{ route('activities.index') }}"
+                   class="group relative flex items-center gap-3 rounded-xl px-3 py-3 {{ request()->routeIs('activities.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} transition-all duration-200">
+                    <svg class="h-6 w-6 shrink-0 group-hover:text-emerald-400 transition-colors" fill="none"
+                         stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    </svg>
+                    <span x-show="!sidebarCollapsed" class="font-medium whitespace-nowrap transition-opacity duration-200">
+                    Activities
+                </span>
+                </a>
+
+                <a href="{{ route('pipeline-templates.index') }}"
+                   class="group relative flex items-center gap-3 rounded-xl px-3 py-3 {{ request()->routeIs('pipeline-templates.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} transition-all duration-200">
+                    <svg class="h-6 w-6 shrink-0 group-hover:text-emerald-400 transition-colors" fill="none"
+                         stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
+                    </svg>
+                    <span x-show="!sidebarCollapsed" class="font-medium whitespace-nowrap transition-opacity duration-200">
+                    Pipeline Template
+                </span>
+                </a>
+
+            @endif
 
     </div>
 
