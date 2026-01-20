@@ -11,7 +11,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="antialiased bg-white text-slate-800">
-
 <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
@@ -22,16 +21,22 @@
                     </svg>
                 </div>
                 <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-600">
-                        FlowCRM
-                    </span>
+                    FlowCRM
+                </span>
             </div>
 
             <div class="flex items-center gap-4">
                 @if (Route::has('login'))
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors">
-                            Dashboard
-                        </a>
+                        @if(auth()->user()->isManager())
+                            <a href="{{ route('teams.index') }}" class="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors">
+                                Manage Team
+                            </a>
+                        @else
+                            <a href="{{ route('dashboard') }}" class="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors">
+                                Dashboard
+                            </a>
+                        @endif
                     @else
                         <a href="{{ route('login') }}" class="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors">
                             Log in
@@ -64,11 +69,18 @@
                 <p class="mt-6 text-lg leading-8 text-slate-600">
                     FlowCRM helps service-based businesses streamline their operations. Manage teams, track sales performance, and organize customer data in one simple platform.
                 </p>
+
                 <div class="mt-10 flex items-center justify-center gap-x-6">
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="rounded-md bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-all">
-                            Go to Dashboard
-                        </a>
+                        @if(auth()->user()->isManager())
+                            <a href="{{ route('users.index') }}" class="rounded-md bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-all">
+                                Go to Team Management
+                            </a>
+                        @else
+                            <a href="{{ route('dashboard') }}" class="rounded-md bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-all">
+                                Go to Dashboard
+                            </a>
+                        @endif
                     @else
                         <a href="{{ route('register') }}" class="rounded-md bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-all">
                             Start Free Trial
