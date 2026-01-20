@@ -121,7 +121,7 @@
 
         @endif
             @if(auth()->user()->isSales())
-                <a href="{{ route('dashboard') }}"
+                <a href="#"
                    class="group relative flex items-center gap-3 rounded-xl px-3 py-3 {{ request()->routeIs('dashboard') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} transition-all duration-200">
                     <svg class="h-6 w-6 shrink-0 group-hover:text-cyan-400 transition-colors" fill="none"
                          stroke="currentColor" viewBox="0 0 24 24">
