@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DealController;
 use App\Http\Controllers\PipelineController;
 use App\Http\Controllers\PipelineTemplateController;
@@ -42,6 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 //    Route::get('/activities/create', [ActivityController::class, 'create'])->name('activities.create');
 //    Route::get('/activities/{id}/edit', [ActivityController::class, 'edit'])->name('activities.edit');
     Route::resource('activities', ActivityController::class);
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 });
     // Sales -> Customer Management
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
