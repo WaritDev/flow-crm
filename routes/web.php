@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\OrganizationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -57,6 +58,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // User Management (Sales Management)
         Route::resource('users', UserController::class)->except(['show']);
+    });
+
+    // Admin
+    Route::middleware(['role:admin'])->group(function () {
+        Route::resource('organizations', OrganizationController::class);
     });
 
 require __DIR__.'/auth.php';
