@@ -1,5 +1,5 @@
 <x-guest-layout>
-    <div class="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-6"
+    <div class="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-6 relative"
          x-data="{
              step: 1,
              role: null,
@@ -55,6 +55,13 @@
              }
          }">
 
+        <a href="{{ url('/') }}" class="absolute top-6 left-6 text-slate-500 hover:text-emerald-600 transition-colors flex items-center gap-2 font-medium text-sm group">
+            <div class="p-2 bg-white rounded-lg shadow-sm border border-slate-200 group-hover:border-emerald-200 group-hover:bg-emerald-50 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            </div>
+            <span class="hidden sm:inline">Back to Home</span>
+        </a>
+
         <div class="mb-8 text-center">
             <div class="flex justify-center mb-3">
                 <div class="h-12 w-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white">
@@ -95,6 +102,7 @@
                                 placeholder="Firstname Lastname"
                                 x-bind:class="nameError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''"
                                 @input="nameError = false"
+                                @keydown.enter.prevent="next()"
                             />
                             <p x-show="nameError" style="display: none;" class="text-sm text-red-600 font-medium animate-pulse mt-1">
                                 Please enter your First Name and Last Name.
@@ -103,7 +111,15 @@
 
                         <div>
                             <x-input-label for="email" value="Email Address" />
-                            <x-text-input id="email" class="block mt-1 w-full px-4 py-2" type="email" name="email" :value="old('email')" required placeholder="example@gmail.com" />
+                            <x-text-input
+                                id="email"
+                                class="block mt-1 w-full px-4 py-2"
+                                type="email"
+                                name="email"
+                                :value="old('email')"
+                                required placeholder="example@gmail.com"
+                                @keydown.enter.prevent="next()"
+                            />
                             <x-input-error :messages="$errors->get('email')" class="mt-2" />
                         </div>
 
@@ -118,6 +134,7 @@
                                     required placeholder="••••••••"
                                     x-bind:class="passwordLengthError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''"
                                     @input="passwordLengthError = false"
+                                    @keydown.enter.prevent="next()"
                                 />
                             </div>
                             <div>
@@ -130,6 +147,7 @@
                                     required placeholder="••••••••"
                                     x-bind:class="passwordError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''"
                                     @input="passwordError = false"
+                                    @keydown.enter.prevent="next()"
                                 />
                             </div>
                         </div>
