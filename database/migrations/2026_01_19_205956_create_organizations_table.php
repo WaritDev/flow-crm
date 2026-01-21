@@ -42,20 +42,61 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::table('customers', function (Blueprint $table) {
-            $table->dropForeign(['organization_id']);
-            $table->dropColumn('organization_id');
-        });
+        try {
+            Schema::table('customers', function (Blueprint $table) {
+                $table->dropForeign(['organization_id']);
+            });
+        } catch (Illuminate\Database\QueryException $e) {
+            // Foreign key might not exist
+        }
 
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign(['organization_id']);
-            $table->dropColumn('organization_id');
-        });
+        if (Schema::hasColumn('customers', 'organization_id')) {
+            Schema::table('customers', function (Blueprint $table) {
+                $table->dropColumn('organization_id');
+            });
+        }
 
-        Schema::table('teams', function (Blueprint $table) {
-            $table->dropForeign(['organization_id']);
-            $table->dropColumn('organization_id');
-        });
+        try {
+            Schema::table('users', function (Blueprint $table) {
+                $table->dropForeign(['organization_id']);
+            });
+        } catch (Illuminate\Database\QueryException $e) {
+            // Foreign key might not exist
+        }
+
+        if (Schema::hasColumn('users', 'organization_id')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->dropColumn('organization_id');
+            });
+        }
+
+        try {
+            Schema::table('teams', function (Blueprint $table) {
+                $table->dropForeign(['organization_id']);
+            });
+        } catch (Illuminate\Database\QueryException $e) {
+            // Foreign key might not exist
+        }
+
+        if (Schema::hasColumn('teams', 'organization_id')) {
+            Schema::table('teams', function (Blueprint $table) {
+                $table->dropColumn('organization_id');
+            });
+        }
+
+        try {
+            Schema::table('deals', function (Blueprint $table) {
+                $table->dropForeign(['organization_id']);
+            });
+        } catch (Illuminate\Database\QueryException $e) {
+            // Foreign key might not exist
+        }
+
+        if (Schema::hasColumn('deals', 'organization_id')) {
+            Schema::table('deals', function (Blueprint $table) {
+                $table->dropColumn('organization_id');
+            });
+        }
 
         // 4. ลบตารางแม่ออกเป็นลำดับสุดท้าย
         Schema::dropIfExists('organizations');

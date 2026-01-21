@@ -33,7 +33,7 @@
                                 Manage Team
                             </a>
                         @else
-                            <a href="{{ route('dashboard') }}" class="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors">
+                            <a href="{{ route('dashboard.index') }}" class="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors">
                                 Dashboard
                             </a>
                         @endif
@@ -77,7 +77,7 @@
                                 Go to Team Management
                             </a>
                         @else
-                            <a href="{{ route('dashboard') }}" class="rounded-md bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-all">
+                            <a href="{{ route('dashboard.index') }}" class="rounded-md bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-all">
                                 Go to Dashboard
                             </a>
                         @endif

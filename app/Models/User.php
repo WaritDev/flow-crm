@@ -70,4 +70,8 @@ class User extends Authenticatable
     {
         return $this->team_id;
     }
+
+    public function getOrganizationId(): ?string {
+        return $this->organization_id;
+    }
 }
