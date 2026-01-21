@@ -97,8 +97,8 @@ docker run --rm \
 
 # ติดตั้ง Front-end Dependencies และรัน Dev Server
 
-./vendor/bin/sail sail yarn install
-./vendor/bin/sail sail yarn dev
+./vendor/bin/sail yarn install
+./vendor/bin/sail yarn dev
 
 ```
 
