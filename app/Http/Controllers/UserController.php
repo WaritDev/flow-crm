@@ -40,7 +40,7 @@ class UserController extends Controller
         $request->validate([
             'name' => [
                 'required', 'string', 'max:255',
-                'regex:/^[\p{L}]+(\s+[\p{L}]+)+$/u'
+                'regex:/^[\p{L}\p{M}]+(\s+[\p{L}\p{M}]+)+$/u'
             ],
             'email' => [
                 'required', 'string', 'lowercase', 'email:rfc,dns', 'max:255',
@@ -85,7 +85,7 @@ class UserController extends Controller
         $request->validate([
             'name' => [
                 'required', 'string', 'max:255',
-                'regex:/^[\p{L}]+(\s+[\p{L}]+)+$/u'
+                'regex:/^[\p{L}\p{M}]+(\s+[\p{L}\p{M}]+)+$/u'
             ],
             'email' => [
                 'required', 'string', 'lowercase', 'email:rfc,dns', 'max:255',
