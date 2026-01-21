@@ -8,10 +8,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next, $role): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (! $request->user() || $request->user()->role !== $role) {
-            abort(403, 'Unauthorized action. Managers only.');
+        if (! $request->user() || ! in_array($request->user()->role, $roles)) {
+            abort(403, 'Unauthorized action. Access restricted to authorized roles.');
         }
 
         return $next($request);

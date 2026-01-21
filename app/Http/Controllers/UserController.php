@@ -19,7 +19,12 @@ class UserController extends Controller
 
         $users = User::with('team')
             ->where('organization_id', Auth::user()->organization_id)
-            ->where('role', 'sales')
+            ->where('id', '!=', Auth::id())
+
+            ->when(Auth::user()->role === 'manager', function ($query) {
+                return $query->where('role', 'sales');
+            })
+
             ->latest()
             ->paginate(10);
 
@@ -47,6 +52,7 @@ class UserController extends Controller
                 'unique:'.User::class
             ],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'role' => ['required', Rule::in(['manager', 'sales'])],
             'team_id' => [
                 'nullable',
                 Rule::exists('teams', 'id')->where(function ($query) {
@@ -58,17 +64,22 @@ class UserController extends Controller
             'email.email' => 'The email address is invalid or the domain does not exist.',
         ]);
 
+        $role = Auth::user()->role === 'admin' ? $request->role : 'sales';
+        $teamId = ($role === 'manager') ? null : $request->team_id;
+
         User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'sales',
-            'team_id' => $request->team_id,
+            'role' => $role,
+            'team_id' => $teamId,
             'last_login' => null,
             'organization_id' => Auth::user()->organization_id,
         ]);
 
-        return redirect()->route('users.index')->with('success', 'New sales Rep created successfully!');
+        $message = $role === 'manager' ? 'New Manager added!' : 'New Sales Rep created successfully!';
+
+        return redirect()->route('users.index')->with('success', $message);
     }
 
     public function edit(User $user)
@@ -91,6 +102,7 @@ class UserController extends Controller
                 'required', 'string', 'lowercase', 'email:rfc,dns', 'max:255',
                 Rule::unique('users')->ignore($user->id)
             ],
+            'role' => ['required', Rule::in(['manager', 'sales'])],
             'team_id' => [
                 'nullable',
                 Rule::exists('teams', 'id')->where(function ($query) {
@@ -98,17 +110,25 @@ class UserController extends Controller
                 })
             ],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'name.regex' => 'The name must follow the "First Last" format.',
         ]);
 
         $user->name = $request->name;
         $user->email = $request->email;
-        $user->team_id = $request->team_id;
+
+        if (Auth::user()->role === 'admin') {
+            $user->role = $request->role;
+        }
+
+        $user->team_id = ($user->role === 'manager') ? null : $request->team_id;
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
 
         $user->save();
+
         return redirect()->route('users.index')->with('success', 'User updated successfully!');
     }
 

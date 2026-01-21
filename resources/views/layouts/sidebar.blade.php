@@ -122,6 +122,7 @@
         @endif
 
         @if(auth()->user()->isAdmin())
+
             <a href="{{ route('organizations.index') }}"
                class="group relative flex items-center gap-3 rounded-xl px-3 py-3 {{ request()->routeIs('organizations.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} transition-all duration-200">
                 <svg class="h-6 w-6 shrink-0 group-hover:text-cyan-400 transition-colors" fill="none"
@@ -130,8 +131,20 @@
                           d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m-1 4h1m5-4h1m-1 4h1m-1-8h1"></path>
                 </svg>
                 <span x-show="!sidebarCollapsed" class="font-medium whitespace-nowrap transition-opacity duration-200">
-                    Organizations
+                Organizations
                 </span>
+            </a>
+
+            <a href="{{ route('users.index') }}"
+               class="group relative flex items-center gap-3 rounded-xl px-3 py-3 {{ request()->routeIs('users.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} transition-all duration-200">
+                <svg class="h-6 w-6 shrink-0 group-hover:text-emerald-400 transition-colors" fill="none"
+                     stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <span x-show="!sidebarCollapsed" class="font-medium whitespace-nowrap transition-opacity duration-200">
+                Manage Users
+            </span>
             </a>
         @endif
 

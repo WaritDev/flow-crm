@@ -46,6 +46,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::middleware(['auth', 'role:manager,admin'])->group(function () {
+        Route::resource('users', UserController::class)->except(['show']);
+    });
+
     // Manager
     Route::middleware(['role:manager'])->group(function () {
 
@@ -55,9 +59,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Custom Routes
         Route::post('/teams/{team}/members', [TeamController::class, 'addMember'])->name('teams.add_member');
         Route::delete('/teams/members/{user}', [TeamController::class, 'removeMember'])->name('teams.remove_member');
-
-        // User Management (sales Management)
-        Route::resource('users', UserController::class)->except(['show']);
     });
 
     // Admin
