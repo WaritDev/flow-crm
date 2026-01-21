@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->foreignId('team_id')->nullable()->constrained('teams')->onDelete('set null');
-            $table->enum('role', ['manager', 'sales'])->default('sales');
+            $table->enum('role', ['admin', 'manager', 'sales'])->default('sales');
             $table->string('img_url')->nullable();
             $table->timestamp('last_login')->nullable();
         });
