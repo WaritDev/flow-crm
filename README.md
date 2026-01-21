@@ -68,9 +68,8 @@ REDIS_HOST=redis
 
 ```
 
-### 3. Install Dependencies & Start Services
-
-ติดตั้งคอมโพเนนต์ที่จำเป็นและรันตู้คอนเทนเนอร์:
+### 3. Install Dependencies & Application Initialization
+ติดตั้งคอมโพเนนต์ที่จำเป็น, ตั้งค่ากุญแจความปลอดภัย และเตรียมฐานข้อมูลพร้อมข้อมูลตัวอย่าง (Seeder):
 
 ```bash
 # ติดตั้ง PHP Dependencies (Composer) ผ่าน Docker
@@ -84,21 +83,22 @@ docker run --rm \
 # รัน Services ทั้งหมดด้วย Laravel Sail
 ./vendor/bin/sail up -d
 
-# รัน Dev Server
-./vendor/bin/sail sail yarn dev
-
-```
-
-### 4. Application Initialization
-
-ตั้งค่ากุญแจความปลอดภัยและเตรียมฐานข้อมูลพร้อมข้อมูลตัวอย่าง (Seeder):
-
-```bash
 # สร้าง APP_KEY
 ./vendor/bin/sail artisan key:generate
 
 # Migration พร้อม Seed ข้อมูลตัวอย่าง (Manager, sales, Templates, Deals)
 ./vendor/bin/sail artisan migrate:refresh --seed
+
+```
+
+### 4. Start Services
+
+```bash
+
+# ติดตั้ง Front-end Dependencies และรัน Dev Server
+
+./vendor/bin/sail sail yarn install
+./vendor/bin/sail sail yarn dev
 
 ```
 
