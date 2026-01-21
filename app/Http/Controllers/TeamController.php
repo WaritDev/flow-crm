@@ -78,4 +78,23 @@ class TeamController extends Controller
 
         return back()->with('success', 'Member removed from team.');
     }
+
+    public function update(Request $request, Team $team)
+    {
+        Gate::authorize('update', $team);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        if ($team->organization_id !== Auth::user()->organization_id) {
+            abort(403);
+        }
+
+        $team->update([
+            'name' => $request->name
+        ]);
+
+        return back()->with('success', 'Team name updated successfully.');
+    }
 }

@@ -17,13 +17,13 @@ class OrganizationSeeder extends Seeder
     {
         $orgA = Organization::create([
             'id' => 1,
-            'name' => 'ร้านคลินิกความงาม A',
-            'slug' => 'clinic-a'
+            'name' => 'Somhai Clinic',
+            'slug' => 'clinic-s'
         ]);
         $orgB = Organization::create([
             'id' => 2,
-            'name' => 'ร้านคลินิกความงาม B',
-            'slug' => 'clinic-b'
+            'name' => 'Aunsit Mala',
+            'slug' => 'mala-a'
         ]);
 
 
@@ -39,7 +39,7 @@ class OrganizationSeeder extends Seeder
 
         $team = Team::create([
             'organization_id' => $org->id,
-            'name' => 'ทีมขายหลัก',
+            'name' => 'main sales team',
             'template_id' => $template->id
         ]);
 
@@ -55,11 +55,5 @@ class OrganizationSeeder extends Seeder
                 $template->stages()->create($stage);
             }
         }
-
-        User::factory()->create([
-            'organization_id' => $org->id,
-            'team_id' => $team->id,
-            'role' => 'manager'
-        ]);
     }
 }

@@ -16,8 +16,7 @@ class TeamSeeder extends Seeder
     public function run(): void
     {
         $template = PipelineTemplate::first();
-        $org = Organization::first();
-        Team::create(['organization_id' => $org->id, 'name' => 'ทีมขายกรุงเทพ', 'template_id' => $template->id]);
-        Team::create(['organization_id' => $org->id, 'name' => 'ทีมขายออนไลน์', 'template_id' => $template->id]);
+        Team::create(['organization_id' => 1, 'name' => 'bangkok sales team', 'template_id' => $template->id]);
+        Team::create(['organization_id' => 2, 'name' => 'online sales team', 'template_id' => $template->id]);
     }
 }

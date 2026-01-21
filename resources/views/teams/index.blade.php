@@ -19,7 +19,6 @@
 
             <form action="{{ route('teams.store') }}" method="POST" class="flex flex-col md:flex-row items-center gap-2 w-full md:w-auto">
                 @csrf
-
                 <input type="text" name="name" placeholder="New Team Name..." required class="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm w-full md:w-64 placeholder-slate-400">
                 <button type="submit" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 text-sm font-medium whitespace-nowrap shadow-sm transition-all focus:ring-4 focus:ring-emerald-500/20 w-full md:w-auto">
                     + Create Team
@@ -31,18 +30,52 @@
             @forelse($teams as $team)
                 <div class="bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col h-full hover:shadow-md transition-shadow duration-200 group/card">
 
-                    <div class="p-4 border-b border-slate-100 flex justify-between items-start bg-slate-50 rounded-t-xl">
-                        <div>
-                            <h3 class="font-bold text-lg text-slate-800">{{ $team->name }}</h3>
-                            <span class="text-xs text-slate-500 font-medium">{{ $team->members->count() }} Members</span>
+                    <div class="p-4 border-b border-slate-100 bg-slate-50 rounded-t-xl"
+                         x-data="{
+                             isEditing: false,
+                             focusInput() { $nextTick(() => { $refs.nameInput.focus(); }); }
+                         }">
+
+                        <div class="flex justify-between items-start" x-show="!isEditing">
+                            <div>
+                                <div class="flex items-center gap-2 group/title">
+                                    <h3 class="font-bold text-lg text-slate-800">{{ $team->name }}</h3>
+
+                                    <button @click="isEditing = true; focusInput()" type="button" class="text-slate-400 hover:text-emerald-600 transition-colors opacity-0 group-hover/card:opacity-100" title="Rename Team">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    </button>
+                                </div>
+                                <span class="text-xs text-slate-500 font-medium">{{ $team->members->count() }} Members</span>
+                            </div>
+
+                            <form action="{{ route('teams.destroy', $team->id) }}" method="POST" onsubmit="return confirm('Delete this team? All members will be unassigned.');">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="text-slate-400 hover:text-red-500 p-1 rounded-md hover:bg-red-50 transition-colors" title="Delete Team">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </form>
                         </div>
 
-                        <form action="{{ route('teams.destroy', $team->id) }}" method="POST" onsubmit="return confirm('Delete this team? All members will be unassigned.');">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="text-slate-400 hover:text-red-500 p-1 rounded-md hover:bg-red-50 transition-colors" title="Delete Team">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
-                        </form>
+                        <div x-show="isEditing" x-cloak class="w-full">
+                            <form action="{{ route('teams.update', $team->id) }}" method="POST" class="flex items-center gap-2">
+                                @csrf @method('PUT')
+                                <input x-ref="nameInput"
+                                       type="text"
+                                       name="name"
+                                       value="{{ $team->name }}"
+                                       class="flex-1 px-2 py-1 text-sm border border-emerald-500 rounded focus:ring-2 focus:ring-emerald-200 outline-none"
+                                       required
+                                       @keydown.escape="isEditing = false">
+
+                                <button type="submit" class="text-white bg-emerald-600 hover:bg-emerald-700 p-1.5 rounded shadow-sm" title="Save">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                </button>
+
+                                <button type="button" @click="isEditing = false" class="text-slate-500 hover:text-slate-700 p-1.5 hover:bg-slate-200 rounded" title="Cancel">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
                     <div class="p-4 flex-1 space-y-3">
@@ -80,19 +113,15 @@
                     <div class="p-4 border-t border-slate-100 bg-slate-50 rounded-b-xl">
                         <form action="{{ route('teams.add_member', $team->id) }}" method="POST" class="flex gap-2">
                             @csrf
-
                             <select name="user_id" required class="flex-1 text-xs md:text-sm border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-white text-slate-700 cursor-pointer">
                                 <option value="">+ Add Member...</option>
-
                                 @foreach($availableUsers as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                 @endforeach
-
                                 @if($availableUsers->isEmpty())
                                     <option value="" disabled>No available users</option>
                                 @endif
                             </select>
-
                             <button type="submit" class="bg-white border border-slate-300 hover:bg-emerald-600 hover:border-emerald-600 hover:text-white text-slate-600 rounded-lg px-3 py-2 transition-all shadow-sm text-xs font-bold uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed" {{ $availableUsers->isEmpty() ? 'disabled' : '' }}>
                                 Add
                             </button>
