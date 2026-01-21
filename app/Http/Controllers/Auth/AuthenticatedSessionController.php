@@ -30,6 +30,10 @@ class AuthenticatedSessionController extends Controller
         $user = $request->user();
         $user->update(['last_login' => now()]);
 
+        if ($user->role === 'admin') {
+            return redirect()->intended(route('organizations.index'));
+        }
+
         if ($user->role === 'manager') {
             return redirect()->intended(route('teams.index'));
         }
