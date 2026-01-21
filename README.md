@@ -84,9 +84,8 @@ docker run --rm \
 # รัน Services ทั้งหมดด้วย Laravel Sail
 ./vendor/bin/sail up -d
 
-# ติดตั้ง Front-end Dependencies และรัน Dev Server
-./vendor/bin/sail npm install
-./vendor/bin/sail npm run dev
+# รัน Dev Server
+./vendor/bin/sail sail yarn dev
 
 ```
 
