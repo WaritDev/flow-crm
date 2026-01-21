@@ -98,7 +98,7 @@ docker run --rm \
 # สร้าง APP_KEY
 ./vendor/bin/sail artisan key:generate
 
-# Migration พร้อม Seed ข้อมูลตัวอย่าง (Manager, Sales, Templates, Deals)
+# Migration พร้อม Seed ข้อมูลตัวอย่าง (Manager, sales, Templates, Deals)
 ./vendor/bin/sail artisan migrate:refresh --seed
 
 ```

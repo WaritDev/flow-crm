@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('team_id')->constrained('teams')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Assigned Sales
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Assigned sales
             $table->string('name');
             $table->string('nickname')->nullable(); // Localized Thai Context [1]
             $table->string('phone_num')->nullable();

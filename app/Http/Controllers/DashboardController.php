@@ -45,7 +45,7 @@ class DashboardController extends Controller
             ['stage' => 'Negotiation', 'count' => 5, 'value' => 1200000],
         ];
 
-        // 3 อันดับ Top Sales
+        // 3 อันดับ Top sales
         $topPerformers = [
             ['name' => 'คุณสมชาย', 'amount' => 450000, 'avatar' => 'S'],
             ['name' => 'คุณวิภา', 'amount' => 320000, 'avatar' => 'W'],

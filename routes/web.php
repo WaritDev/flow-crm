@@ -37,7 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('activities', ActivityController::class);
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 });
-    // Sales -> Customer Management
+    // sales -> Customer Management
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
 
     // Profile Management
@@ -55,7 +55,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/teams/{team}/members', [TeamController::class, 'addMember'])->name('teams.add_member');
         Route::delete('/teams/members/{user}', [TeamController::class, 'removeMember'])->name('teams.remove_member');
 
-        // User Management (Sales Management)
+        // User Management (sales Management)
         Route::resource('users', UserController::class)->except(['show']);
     });
 

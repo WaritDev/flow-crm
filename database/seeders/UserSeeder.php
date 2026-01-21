@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
             'password' => bcrypt('password'), 'role' => 'manager', 'team_id' => $team->id
         ]);
 
-        // Sales (use Fake kub P)
+        // sales (use Fake kub P)
         for ($i = 1; $i <= 4; $i++) {
             User::create([
                 'organization_id' => $org->id,

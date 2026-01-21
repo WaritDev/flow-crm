@@ -62,8 +62,8 @@ class PipelineTemplateController extends Controller
                 'icon' => 'briefcase',
                 'color' => 'indigo',
                 'is_popular' => false,
-                'title_th' => 'ธุรกิจ B2B Sales',
-                'title_en' => 'B2B Sales',
+                'title_th' => 'ธุรกิจ B2B sales',
+                'title_en' => 'B2B sales',
                 'description' => 'สำหรับขายองค์กร, ขายส่ง, ดีลขนาดใหญ่ที่ต้องติดตามหลายขั้นตอน',
                 'stages' => ['Lead', 'ติดต่อ', 'นำเสนอ', 'Proposal', 'เจรจา', 'ปิดการขาย'],
                 'script_count' => 15
