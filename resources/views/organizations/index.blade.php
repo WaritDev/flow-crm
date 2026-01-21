@@ -33,6 +33,9 @@
                     <thead>
                     <tr class="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500 font-semibold tracking-wider">
                         <th class="px-6 py-4">Organization Name</th>
+                        <th class="px-6 py-4">Slug</th>
+                        <th class="px-6 py-4">Size</th>
+                        <th class="px-6 py-4">Invite Code</th>
                         <th class="px-6 py-4 text-center">Actions</th>
                     </tr>
                     </thead>
@@ -47,8 +50,38 @@
                                     </div>
                                     <div>
                                         <p class="text-sm font-medium text-slate-900">{{ $organization->name }}</p>
+                                        @if($organization->description)
+                                            <p class="text-xs text-slate-500 line-clamp-1">{{ $organization->description }}</p>
+                                        @endif
                                     </div>
                                 </div>
+                            </td>
+
+                            <td class="px-6 py-4">
+                                <span class="text-sm text-slate-600">{{ $organization->slug }}</span>
+                            </td>
+
+                            <td class="px-6 py-4">
+                                @if($organization->size)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                        @if($organization->size == 'small') bg-blue-100 text-blue-800
+                                        @elseif($organization->size == 'medium') bg-green-100 text-green-800
+                                        @elseif($organization->size == 'large') bg-purple-100 text-purple-800
+                                        @else bg-orange-100 text-orange-800
+                                        @endif">
+                                        {{ ucfirst($organization->size) }}
+                                    </span>
+                                @else
+                                    <span class="text-xs text-slate-400">-</span>
+                                @endif
+                            </td>
+
+                            <td class="px-6 py-4">
+                                @if($organization->invite_code)
+                                    <code class="px-2 py-1 text-xs font-mono bg-slate-100 text-slate-700 rounded">{{ $organization->invite_code }}</code>
+                                @else
+                                    <span class="text-xs text-slate-400">-</span>
+                                @endif
                             </td>
 
                             <td class="px-6 py-4 text-center">
@@ -69,7 +102,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="2" class="px-6 py-10 text-center text-slate-500">
+                            <td colspan="5" class="px-6 py-10 text-center text-slate-500">
                                 No organizations found. Click "Add Organization" to create one.
                             </td>
                         </tr>
