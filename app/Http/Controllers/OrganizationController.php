@@ -35,6 +35,10 @@ class OrganizationController extends Controller
         Gate::authorize('create', Organization::class);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:organizations,slug',
+            'size' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'invite_code' => 'nullable|string|max:255|unique:organizations,invite_code',
         ]);
 
         Organization::create($validated);
@@ -68,6 +72,10 @@ class OrganizationController extends Controller
         Gate::authorize('update', $organization);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:organizations,slug,' . $organization->id,
+            'size' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'invite_code' => 'nullable|string|max:255|unique:organizations,invite_code,' . $organization->id,
         ]);
 
         $organization->update($validated);
