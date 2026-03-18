@@ -30,6 +30,11 @@ class AuthenticatedSessionController extends Controller
         $user = $request->user();
         $user->update(['last_login' => now()]);
 
+        if ($user->role === 'sales') {
+            $salesAppUrl = rtrim((string) env('SALES_APP_URL', 'http://localhost:3000'), '/');
+            return redirect()->away($salesAppUrl . '/pipeline-stages');
+        }
+
         if ($user->role === 'admin') {
             return redirect()->intended(route('organizations.index'));
         }
