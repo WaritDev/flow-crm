@@ -101,6 +101,7 @@ class DealController extends Controller
         }
 
         $deal = Deal::create([
+            'organization_id' => Auth::user()->getOrganizationId(),
             'team_id' => Auth::user()->getTeamId(),
             'user_id' => Auth::id(),
             'customer_id' => $request->customer_id,

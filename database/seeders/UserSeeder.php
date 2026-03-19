@@ -19,38 +19,53 @@ class UserSeeder extends Seeder
 
         // Admin
         User::create([
-            'organization_id' => $team1->id,
-            'name' => 'ผู้ดูแลระบบ', 'email' => 'admin@flowcrm.com',
-            'password' => bcrypt('password'), 'role' => 'admin',
+            'organization_id' => 1,
+            'team_id' => $team1->id,
+            'name' => 'ผู้ดูแลระบบ',
+            'email' => 'admin@flowcrm.com',
+            'password' => bcrypt('password'),
+            'role' => 'admin',
         ]);
 
         // Manager
         User::create([
             'organization_id' => 1,
-            'name' => 'Somchai Yachai', 'email' => 'manager@org1.com',
-            'password' => bcrypt('password'), 'role' => 'manager'
+            'team_id' => $team1->id,
+            'name' => 'Somchai Yachai',
+            'email' => 'manager@org1.com',
+            'password' => bcrypt('password'),
+            'role' => 'manager'
         ]);
 
         User::create([
             'organization_id' => 2,
-            'name' => 'Anusit Srikirin', 'email' => 'manager@org2.com',
-            'password' => bcrypt('password'), 'role' => 'manager'
+            'team_id' => $team2->id,
+            'name' => 'Anusit Srikirin',
+            'email' => 'manager@org2.com',
+            'password' => bcrypt('password'),
+            'role' => 'manager'
         ]);
 
         // sales (use Fake kub P)
         for ($i = 1; $i <= 4; $i++) {
             User::create([
                 'organization_id' => 1,
-                'name' => fake()->firstName() . ' ' . fake()->lastName(), 'email' => "sales$i@org1.com",
-                'password' => bcrypt('password'), 'role' => 'sales', 'team_id' => $team1->id
+                'name' => fake()->firstName() . ' ' . fake()->lastName(),
+                'email' => "sales$i@org1.com",
+                'password' => bcrypt('password'),
+                'role' => 'sales',
+                'team_id' => $team1->id
             ]);
         }
 
         for ($i = 1; $i <= 4; $i++) {
             User::create([
                 'organization_id' => 2,
-                'name' => fake()->firstName() . ' ' . fake()->lastName(), 'email' => "sales$i@org2.com",
-                'password' => bcrypt('password'), 'role' => 'sales', 'team_id' => $team2->id
+                'name' => fake()->firstName() . ' ' . fake()->lastName(),
+                'email' => "sales$i@org2.com",
+                'password' => bcrypt('password'),
+                'role' => 'sales',
+                'team_id' => $team2->id
             ]);
         }
     }

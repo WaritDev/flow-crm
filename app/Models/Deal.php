@@ -11,7 +11,7 @@ class Deal extends Model
     protected $fillable = [
         'customer_id', 'user_id', 'team_id', 'stage_id', 'name', 'description',
         'value', 'currency', 'expected_close_date', 'next_action',
-        'next_action_date', 'lost_reason', 'won_at', 'lost_at'
+        'next_action_date', 'lost_reason', 'won_at', 'lost_at', 'organization_id'
     ];
 
     protected $casts = [

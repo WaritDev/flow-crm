@@ -10,11 +10,25 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrganizationController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('index');
 });
+
+Route::middleware(['auth'])->get('/me', function (Request $request) {
+    $user = $request->user();
+
+    return response()->json([
+        'id' => (string) $user->id,
+        'name' => $user->name,
+        'email' => $user->email,
+        'role' => $user->role,
+        'team_id' => $user->team_id,
+        'organization_id' => $user->organization_id,
+    ]);
+})->name('me');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
