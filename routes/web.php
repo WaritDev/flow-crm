@@ -78,6 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Admin
     Route::middleware(['role:admin'])->group(function () {
         Route::resource('organizations', OrganizationController::class);
+        Route::get('/organization-users', [OrganizationController::class, 'usersIndex'])->name('organization-users.index');
     });
 
 require __DIR__.'/auth.php';
