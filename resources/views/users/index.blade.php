@@ -5,8 +5,10 @@
     <div class="space-y-6">
 
         @if(session('success'))
-            <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 flex items-center gap-2 border border-green-100 shadow-sm transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
                 <span class="font-medium">Success!</span> {{ session('success') }}
             </div>
         @endif
@@ -14,8 +16,12 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div class="flex items-center gap-4">
                 @if(auth()->user()->isAdmin() && request('organization_id'))
-                    <a href="{{ route('organization-users.index') }}" class="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-slate-600 shadow-sm transition-all" title="Back to Organization List">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7 7-7"></path></svg>
+                    <a href="{{ route('organization-users.index') }}" 
+                        class="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-slate-600 shadow-sm transition-all" 
+                        title="Back to Organization Selection">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7 7-7"></path>
+                        </svg>
                     </a>
                 @endif
 
@@ -23,7 +29,7 @@
                     <h2 class="text-2xl font-bold text-slate-800">
                         @if(isset($selectedOrg))
                             Members of {{ $selectedOrg->name }}
-                        @elseif(auth()->user()->role === 'manager')
+                        @elseif(auth()->user()->isManager())
                             My Sales Team
                         @else
                             Organization Members
@@ -31,15 +37,16 @@
                     </h2>
                     <p class="text-sm text-slate-500 mt-1">
                         @if(isset($selectedOrg))
-                            Managing managers and sales reps for <strong>{{ $selectedOrg->name }}</strong>.
+                            Managing managers and sales representatives for <strong>{{ $selectedOrg->name }}</strong>.
                         @else
-                            Manage all Managers and Sales Representatives.
+                            Manage all Managers and Sales Representatives in the system.
                         @endif
                     </p>
                 </div>
             </div>
 
-            <a href="{{ route('users.create', ['organization_id' => request('organization_id')]) }}" class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white transition-colors bg-slate-900 rounded-lg hover:bg-slate-800 shadow-sm">
+            <a href="{{ route('users.create', ['organization_id' => request('organization_id')]) }}" 
+                class="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white transition-all bg-slate-900 rounded-lg hover:bg-slate-800 shadow-sm active:scale-95">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
@@ -56,6 +63,7 @@
                         <th class="px-6 py-4">Role</th>
                         <th class="px-6 py-4">Team</th>
                         <th class="px-6 py-4">Last Login</th>
+                        <th class="px-6 py-4 text-center">Status</th>
                         <th class="px-6 py-4 text-center">Actions</th>
                     </tr>
                     </thead>
@@ -103,18 +111,44 @@
                                 {{ $user->last_login ? \Carbon\Carbon::parse($user->last_login)->diffForHumans() : 'Never' }}
                             </td>
 
+                            <td class="px-6 py-4">
+                                <div class="flex justify-center">
+                                    @if(auth()->id() !== $user->id)
+                                        <form action="{{ route('users.toggle-status', $user->id) }}" method="POST">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" 
+                                                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 {{ $user->is_active ? 'bg-emerald-500' : 'bg-slate-200' }}"
+                                                title="{{ $user->is_active ? 'Deactivate' : 'Activate' }} {{ $user->name }}">
+                                                <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $user->is_active ? 'translate-x-5' : 'translate-x-0' }}"></span>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="text-[10px] uppercase font-bold text-slate-300 tracking-tight">System Account</span>
+                                    @endif
+                                </div>
+                            </td>
+
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
-                                    <a href="{{ route('users.edit', [$user->id, 'organization_id' => request('organization_id')]) }}" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    {{-- Edit Link (รักษา org context) --}}
+                                    <a href="{{ route('users.edit', [$user->id, 'organization_id' => request('organization_id')]) }}" 
+                                        class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" 
+                                        title="Edit User">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
                                     </a>
 
                                     @if(auth()->id() !== $user->id)
-                                        <form action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Delete {{ $user->name }}?');">
-                                            @csrf @method('DELETE')
+                                        <form action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete {{ $user->name }}?');">
+                                            @csrf 
+                                            @method('DELETE')
                                             <input type="hidden" name="organization_id" value="{{ request('organization_id') }}">
-                                            <button type="submit" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            <button type="submit" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete User">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                </svg>
                                             </button>
                                         </form>
                                     @endif
@@ -123,8 +157,13 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-10 text-center text-slate-500">
-                                No users found for this organization.
+                            <td colspan="6" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center justify-center text-slate-400">
+                                    <svg class="w-12 h-12 mb-3 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                    </svg>
+                                    <p class="text-sm">No members found in this organization.</p>
+                                </div>
                             </td>
                         </tr>
                     @endforelse
@@ -132,9 +171,11 @@
                 </table>
             </div>
 
-            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50">
-                {{ $users->appends(['organization_id' => request('organization_id')])->links() }}
-            </div>
+            @if($users->hasPages())
+                <div class="px-6 py-4 border-t border-slate-200 bg-slate-50">
+                    {{ $users->appends(['organization_id' => request('organization_id')])->links() }}
+                </div>
+            @endif
         </div>
     </div>
 @endsection
