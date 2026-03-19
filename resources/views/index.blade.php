@@ -75,9 +75,9 @@
 
                 <div class="mt-10 flex items-center justify-center gap-x-6">
                     @auth
-                        @if(auth()->user()->isManager())
-                            <a href="{{ route('users.index') }}" class="rounded-md bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-all">
-                                Go to Team Management
+                        @if(auth()->user()->isAdmin())
+                            <a href="{{ route('organizations.index') }}" class="rounded-md bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-all">
+                                Go to Organization Management
                             </a>
                         @else
                             <a href="{{ route('dashboard.index') }}" class="rounded-md bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-all">
