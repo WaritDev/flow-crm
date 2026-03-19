@@ -62,6 +62,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware(['auth', 'role:manager,admin'])->group(function () {
         Route::resource('users', UserController::class)->except(['show']);
+        Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
     });
 
     // Manager

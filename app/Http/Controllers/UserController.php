@@ -149,4 +149,13 @@ class UserController extends Controller
         $user->delete();
         return back()->with('success', 'User deleted successfully.');
     }
+
+    public function toggleStatus(User $user)
+    {
+        Gate::authorize('update', $user);
+        $user->is_active = !$user->is_active;
+        $user->save();
+        $status = $user->is_active ? 'activated' : 'deactivated';
+        return back()->with('success', "User account has been {$status}!");
+    }
 }
