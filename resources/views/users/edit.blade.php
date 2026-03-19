@@ -3,17 +3,23 @@
 @section('content')
     <div class="max-w-2xl mx-auto space-y-6">
         <div class="flex items-center justify-between">
-            <div>
-                <h2 class="text-2xl font-bold text-slate-800">
-                    Edit {{ $user->role === 'manager' ? 'Manager' : 'Sales Rep' }}
-                </h2>
-                <p class="text-sm text-slate-500">Update information for {{ $user->name }}.</p>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('users.index', ['organization_id' => $targetOrgId]) }}" 
+                    class="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-slate-600 shadow-sm transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7 7-7"></path></svg>
+                </a>
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">
+                        Edit {{ $user->role === 'manager' ? 'Manager' : 'Sales Rep' }}
+                    </h2>
+                    <p class="text-sm text-slate-500">Update information for {{ $user->name }}.</p>
+                </div>
             </div>
-            <a href="{{ route('users.index') }}" class="text-sm text-slate-500 hover:text-slate-700">Cancel</a>
+            <a href="{{ route('users.index', ['organization_id' => $targetOrgId]) }}" class="text-sm text-slate-500 hover:text-slate-700 font-medium">Cancel</a>
         </div>
 
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <form action="{{ route('users.update', $user->id) }}" method="POST" class="space-y-5">
+            <form action="{{ route('users.update', $user->id)}}" method="POST" class="space-y-5">
                 @csrf
                 @method('PUT')
 
@@ -26,7 +32,11 @@
 
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Account Role</label>
-                        @if(auth()->user()->role === 'admin')
+                        @php
+                            $currentUser = auth()->user();
+                        @endphp
+
+                        @if($currentUser->role === 'admin')
                             <select name="role" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white cursor-pointer">
                                 <option value="sales" {{ old('role', $user->role) == 'sales' ? 'selected' : '' }}>Sales</option>
                                 <option value="manager" {{ old('role', $user->role) == 'manager' ? 'selected' : '' }}>Manager</option>
@@ -61,6 +71,7 @@
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
                     </div>
+                    <p class="text-[11px] text-slate-400 mt-1 italic">* Manager role will ignore team assignment.</p>
                 </div>
 
                 <hr class="border-slate-100 my-4">
@@ -86,10 +97,10 @@
                 </div>
 
                 <div class="pt-2 flex justify-end gap-3">
-                    <a href="{{ route('users.index') }}" class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 font-medium transition-colors">
+                    <a href="{{ route('users.index', ['organization_id' => $targetOrgId]) }}" class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 font-medium transition-colors">
                         Cancel
                     </a>
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 font-medium shadow-sm transition-all flex items-center gap-2">
+                    <button type="submit" class="bg-slate-900 text-white px-6 py-2.5 rounded-lg hover:bg-slate-800 font-medium shadow-sm transition-all flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         Update User
                     </button>
