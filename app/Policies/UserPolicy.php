@@ -13,9 +13,14 @@ class UserPolicy
 
     public function view(User $loggedInUser, User $targetUser): bool
     {
-        if ($loggedInUser->isAdmin() || $loggedInUser->isManager()) {
+        if ($loggedInUser->isAdmin()) {
+            return is_null($loggedInUser->organization_id) || $loggedInUser->organization_id === $targetUser->organization_id;
+        }
+
+        if ($loggedInUser->isManager()) {
             return $loggedInUser->organization_id === $targetUser->organization_id;
         }
+
         return $loggedInUser->id === $targetUser->id;
     }
 
@@ -26,16 +31,31 @@ class UserPolicy
 
     public function update(User $loggedInUser, User $targetUser): bool
     {
-        if ($loggedInUser->isAdmin() || $loggedInUser->isManager()) {
+        if ($loggedInUser->isAdmin()) {
+            return is_null($loggedInUser->organization_id) || $loggedInUser->organization_id === $targetUser->organization_id;
+        }
+
+        if ($loggedInUser->isManager()) {
             return $loggedInUser->organization_id === $targetUser->organization_id;
         }
+
         return $loggedInUser->id === $targetUser->id;
     }
 
     public function delete(User $loggedInUser, User $targetUser): bool
     {
-        return ($loggedInUser->isAdmin() || $loggedInUser->isManager())
-            && $loggedInUser->organization_id === $targetUser->organization_id
-            && $loggedInUser->id !== $targetUser->id;
+        if ($loggedInUser->id === $targetUser->id) {
+            return false;
+        }
+
+        if ($loggedInUser->isAdmin()) {
+            return is_null($loggedInUser->organization_id) || $loggedInUser->organization_id === $targetUser->organization_id;
+        }
+
+        if ($loggedInUser->isManager()) {
+            return $loggedInUser->organization_id === $targetUser->organization_id;
+        }
+
+        return false;
     }
 }
