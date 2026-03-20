@@ -22,6 +22,14 @@ class UserController extends Controller
         $query = User::with(['team', 'organization'])
             ->where('id', '!=', $currentUser->id);
 
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
         if ($currentUser->role === 'admin') {
             if ($request->filled('organization_id')) {
                 $query->where('organization_id', $request->organization_id);
