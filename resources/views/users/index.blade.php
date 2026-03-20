@@ -1,43 +1,43 @@
 @extends('layouts.app')
 
 @section('content')
+
+@if(session('success'))
+    <div 
+        x-data="{ show: true }" 
+        x-init="setTimeout(() => show = false, 2000)" 
+        x-show="show"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform translate-y-8"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="fixed bottom-5 right-5 z-[100] max-w-sm w-full bg-white border border-slate-200 shadow-2xl rounded-2xl p-4 flex items-center gap-4 ring-1 ring-black/5"
+    >
+        <div class="flex-shrink-0 bg-emerald-500 p-2 rounded-xl shadow-lg shadow-emerald-200">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        <div class="flex-1">
+            <h4 class="text-sm font-bold text-slate-900">Success!</h4>
+            <p class="text-xs text-slate-500 mt-0.5">{{ session('success') }}</p>
+        </div>
+        <button @click="show = false" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    </div>
+@endif
+
 <div class="space-y-6" x-data="{ 
     openDeleteModal: false, 
     deleteUrl: '', 
     userName: '',
     orgId: '{{ request('organization_id') }}'
 }">
-
-    @if(session('success'))
-        <div 
-            x-data="{ show: true }" 
-            x-init="setTimeout(() => show = false, 2000)" 
-            x-show="show"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 transform translate-y-8"
-            x-transition:enter-end="opacity-100 transform translate-y-0"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            class="fixed bottom-5 right-5 z-[100] max-w-sm w-full bg-white border border-slate-200 shadow-2xl rounded-2xl p-4 flex items-center gap-4 ring-1 ring-black/5"
-        >
-            <div class="flex-shrink-0 bg-emerald-500 p-2 rounded-xl shadow-lg shadow-emerald-200">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-            </div>
-            <div class="flex-1">
-                <h4 class="text-sm font-bold text-slate-900">Success!</h4>
-                <p class="text-xs text-slate-500 mt-0.5">{{ session('success') }}</p>
-            </div>
-            <button @click="show = false" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
-    @endif
-
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div class="flex items-center gap-4">
             @if(auth()->user()->isAdmin() && request('organization_id'))
