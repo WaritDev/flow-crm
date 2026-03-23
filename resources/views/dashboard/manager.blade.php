@@ -28,11 +28,6 @@
                 <h1 class="text-2xl font-bold text-slate-900">Manager Dashboard</h1>
                 <p class="text-slate-500">ภาพรวมประสิทธิภาพทีมขายประจำเดือนนี้</p>
             </div>
-
-            <div class="flex bg-slate-100 p-1 rounded-lg">
-                <a href="{{ route('dashboard.index', ['view' => 'sales']) }}" class="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700">Sales View</a>
-                <span class="px-4 py-2 text-sm font-medium bg-white text-slate-800 shadow-sm rounded-md">Manager View</span>
-            </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">

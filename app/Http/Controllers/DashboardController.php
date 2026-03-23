@@ -9,16 +9,16 @@ class DashboardController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
-//        $isManager = request('view') === 'manager' || (auth()->check() && auth()->user()->role === 'manager');
-        $isManager = request('view') === 'manager';
+        /** @var \App\Models\User $user */
+        $user = $request->user();
 
-        if ($isManager) {
+        if ($user->isManager()) {
             return $this->managerDashboard();
-        } else {
-            return $this->salesDashboard();
         }
+
+        return $this->salesDashboard();
     }
 
     private function managerDashboard()
