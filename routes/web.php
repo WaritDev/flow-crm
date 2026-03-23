@@ -12,6 +12,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrganizationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\InvitationController;
+use App\Models\Invitation;
 
 Route::get('/', function () {
     return view('index');
@@ -74,6 +76,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Custom Routes
         Route::post('/teams/{team}/members', [TeamController::class, 'addMember'])->name('teams.add_member');
         Route::delete('/teams/members/{user}', [TeamController::class, 'removeMember'])->name('teams.remove_member');
+
+        // Invitation Management
+        Route::post('/invitations', [InvitationController::class, 'store'])->name('invitations.store');
     });
 
     // Admin
@@ -81,5 +86,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('organizations', OrganizationController::class);
         Route::get('/organization-users', [OrganizationController::class, 'usersIndex'])->name('organization-users.index');
     });
+
+    // Invitation Acceptance Route
+    Route::get('/register/invite/{token}', function ($token) {
+        $invitation = \App\Models\Invitation::where('token', $token)
+                        ->where('expires_at', '>', now())
+                        ->firstOrFail(); 
+
+        return view('auth.register-invite', compact('invitation'));
+    })->name('register.invite');
+    Route::post('/register/invite', [InvitationController::class, 'accept'])->name('register.invite.submit');
 
 require __DIR__.'/auth.php';
