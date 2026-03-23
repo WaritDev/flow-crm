@@ -3,15 +3,18 @@
 @section('content')
     <div class="max-w-2xl mx-auto space-y-6">
         <div class="flex items-center justify-between">
-            <div>
-                <h2 class="text-2xl font-bold text-slate-800">
-                    {{ auth()->user()->role === 'admin' ? 'Create New Member' : 'Add New Sales Rep' }}
-                </h2>
-                <p class="text-sm text-slate-500">
-                    {{ auth()->user()->role === 'admin' ? 'Add a new manager or sales rep.' : 'Create a new user account for your sales team.' }}
-                </p>
-            </div>
-            <a href="{{ route('organization-users.index', ['organization' => $targetOrgId]) }}" class="text-sm text-slate-500 hover:text-slate-700 font-medium">Cancel</a>
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800">
+                {{ auth()->user()->role === 'admin' ? 'Create New Member' : 'Add New Sales Rep' }}
+            </h2>
+            <p class="text-sm text-slate-500">
+                {{ auth()->user()->role === 'admin' ? 'Add a new manager or sales rep.' : 'Create a new user account for your sales team.' }}
+            </p>
+        </div>
+            <a href="{{ auth()->user()->role === 'manager' ? route('users.index') : route('organization-users.index', ['organization_id' => $targetOrgId]) }}" 
+                class="text-sm text-slate-500 hover:text-slate-700 font-medium transition-colors">
+                    Cancel
+            </a>
         </div>
 
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
