@@ -122,6 +122,31 @@ class ManagerDashboardSeeder extends Seeder
                     $wonAt = $isWon ? $dealDate->copy()->addDays(rand(5, 30)) : null;
                     $lostAt = $randomStage->name === 'สูญเสีย (Lost)' ? $dealDate->copy()->addDays(rand(5, 30)) : null;
 
+                    $bucket = rand(0, 2); // 0 overdue, 1 today, 2 future
+                    $timeHour = rand(9, 17);
+                    $todayStart = Carbon::now()->startOfDay();
+                    $nextActionDate = match ($bucket) {
+                        0 => $todayStart->copy()->subDays(rand(1, 5)),
+                        1 => $todayStart->copy(),
+                        default => $todayStart->copy()->addDays(rand(1, 5)),
+                    };
+                    $nextActionDate = $nextActionDate->setTime($timeHour, 0, 0);
+                    $nextAction = 'ทักเพื่อขอข้อมูลเพิ่มเติมทาง LINE';
+                    $stageName = $randomStage->name;
+                    if (str_contains($stageName, 'สนใจ')) {
+                        $nextAction = 'ทักเพื่อขอข้อมูลเพิ่มเติมทาง LINE';
+                    } elseif (str_contains($stageName, 'ติดต่อแล้ว')) {
+                        $nextAction = 'นัดหมายเพื่อคุยรายละเอียดให้ชัดเจน';
+                    } elseif (str_contains($stageName, 'เสนอราคา')) {
+                        $nextAction = 'ส่งใบเสนอราคาและถามความคืบหน้าผ่าน LINE';
+                    } elseif (str_contains($stageName, 'เจรจา')) {
+                        $nextAction = 'ต่อรองราคา/เงื่อนไขและขอเอกสารเพิ่มเติม';
+                    } elseif (str_contains($stageName, 'ปิดการขาย')) {
+                        $nextAction = 'ยืนยันการเซ็นสัญญาและขั้นตอนถัดไป';
+                    } elseif (str_contains($stageName, 'สูญเสีย') || str_contains(mb_strtolower($stageName), 'lost')) {
+                        $nextAction = 'ติดตามผลหลังดีลจบ';
+                    }
+
                     $deal = Deal::create([
                         'organization_id' => $org->id,
                         'customer_id' => $customer->id,
@@ -131,10 +156,45 @@ class ManagerDashboardSeeder extends Seeder
                         'name' => 'Deal for ' . $customer->name,
                         'value' => rand(30000, 450000),
                         'expected_close_date' => $dealDate->copy()->addDays(rand(10, 45)),
+                        'next_action' => $nextAction,
+                        'next_action_date' => $nextActionDate,
                         'won_at' => $wonAt,
                         'lost_at' => $lostAt,
                         'created_at' => $dealDate,
                         'updated_at' => $wonAt ?? ($lostAt ?? $dealDate->copy()->addDays(rand(1, 15))),
+                    ]);
+
+                    $stageLabel = $deal->lost_at !== null
+                        ? 'Lost'
+                        : ($deal->won_at !== null ? 'Won' : ($randomStage->name ?? 'Unknown'));
+
+                    // Stage progress (timeline header)
+                    Activity::create([
+                        'deal_id' => $deal->id,
+                        'customer_id' => $customer->id,
+                        'user_id' => $sales->id,
+                        'team_id' => $team->id,
+                        'name' => 'Stage: ' . $stageLabel,
+                        'activity_type' => 'task',
+                        'priority' => 1,
+                        'is_completed' => true,
+                        'description' => 'DEAL_STAGE_PROGRESS',
+                        'created_at' => $dealDate->copy(),
+                    ]);
+
+                    // Progress task (Action Stream)
+                    $priority = $nextActionDate->lt($todayStart) ? 3 : ($nextActionDate->isSameDay($todayStart) ? 2 : 1);
+                    Activity::create([
+                        'deal_id' => $deal->id,
+                        'customer_id' => $customer->id,
+                        'user_id' => $sales->id,
+                        'team_id' => $team->id,
+                        'name' => $nextAction,
+                        'activity_type' => 'task',
+                        'priority' => $priority,
+                        'is_completed' => false,
+                        'description' => 'DEAL_PROGRESS_TASK',
+                        'created_at' => $dealDate->copy()->addDays(0),
                     ]);
 
                     Activity::create([
@@ -145,7 +205,7 @@ class ManagerDashboardSeeder extends Seeder
                         'name' => 'Follow up with ' . $customer->nickname,
                         'activity_type' => ['call', 'line', 'meeting', 'email'][rand(0, 3)],
                         'priority' => rand(1, 3),
-                        'is_completed' => (bool)rand(0, 1),
+                        'is_completed' => true,
                         'created_at' => $dealDate->copy()->addDays(rand(0, 10)), 
                     ]);
                 }

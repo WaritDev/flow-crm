@@ -18,6 +18,26 @@ class ActivitySeeder extends Seeder
         $todayStart = now()->startOfDay();
 
         foreach ($deals as $deal) {
+            // Stage progress event for timeline grouping
+            $stageLabel = $deal->lost_at !== null
+                ? 'Lost'
+                : ($deal->won_at !== null
+                    ? 'Won'
+                    : ($deal->stage?->name ?? 'Unknown'));
+
+            Activity::create([
+                'deal_id' => $deal->id,
+                'customer_id' => $deal->customer_id,
+                'user_id' => $deal->user_id,
+                'team_id' => $deal->team_id,
+                'name' => 'Stage: ' . $stageLabel,
+                'description' => 'DEAL_STAGE_PROGRESS',
+                'activity_type' => 'task',
+                'priority' => 1,
+                'is_completed' => true,
+                'created_at' => now()->subDays(fake()->numberBetween(12, 18))->setTime(fake()->numberBetween(9, 17), 0, 0),
+            ]);
+
             // ประวัติกิจกรรม (ทำเสร็จแล้ว) เพื่อให้ demo ดูมีความสมจริงบนประวัติ/สถิติ
             $historyCount = fake()->numberBetween(1, 2);
             for ($i = 0; $i < $historyCount; $i++) {
@@ -73,7 +93,7 @@ class ActivitySeeder extends Seeder
             Activity::create([
                 'deal_id' => $deal->id,
                 'name' => $deal->next_action,
-                'description' => 'กิจกรรมที่ต้องทำตามแผนการขาย',
+                'description' => 'DEAL_PROGRESS_TASK',
                 'activity_type' => $activityType,
                 'priority' => $priority,
                 'is_completed' => false,

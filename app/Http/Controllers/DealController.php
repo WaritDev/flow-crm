@@ -153,9 +153,24 @@ class DealController extends Controller
             'team_id' => Auth::user()->getTeamId(),
             'activity_type' => 'task',
             'name' => $request->next_action ?? 'Deal Created',
-            'due_date' => $request->next_action_date ?? now(),
+            'description' => 'DEAL_PROGRESS_TASK',
             'priority' => 1,
             'is_completed' => false
+        ]);
+
+        // Record initial stage progress so timeline shows "progress" even before
+        // any follow-up activities happen.
+        $stageLabel = $lostAt ? 'Lost' : ($wonAt ? 'Won' : (PipelineStage::find($stageId)?->name ?? 'Unknown'));
+        Activity::create([
+            'deal_id' => $deal->id,
+            'user_id' => Auth::id(),
+            'customer_id' => $customer->id,
+            'team_id' => Auth::user()->getTeamId(),
+            'activity_type' => 'task',
+            'name' => 'Stage: ' . $stageLabel,
+            'description' => 'DEAL_STAGE_PROGRESS',
+            'priority' => 1,
+            'is_completed' => true,
         ]);
 
         return redirect()->route('pipeline-stages.index')->with('success', 'สร้างดีลเรียบร้อยแล้ว');
@@ -195,6 +210,10 @@ class DealController extends Controller
     public function update(Request $request, Deal $deal)
     {
         Gate::authorize('update', $deal);
+        $beforeStageId = $deal->stage_id;
+        $beforeIsWon = $deal->won_at !== null;
+        $beforeIsLost = $deal->lost_at !== null;
+
         $request->validate([
             'name' => 'required',
             'customer_id' => 'required|exists:customers,id',
@@ -265,6 +284,69 @@ class DealController extends Controller
         }
 
         $deal->update($data);
+
+        $afterIsWon = $deal->fresh()->won_at !== null;
+        $afterIsLost = $deal->fresh()->lost_at !== null;
+        $stageChanged =
+            (string) $deal->stage_id !== (string) $beforeStageId ||
+            $afterIsWon !== $beforeIsWon ||
+            $afterIsLost !== $beforeIsLost;
+
+        // 1) Stage progress event (if stage/won/lost changed)
+        if ($stageChanged) {
+            $stageLabel = $afterIsLost
+                ? 'Lost'
+                : ($afterIsWon ? 'Won' : ($deal->stage?->name ?? 'Unknown'));
+
+            Activity::create([
+                'deal_id' => $deal->id,
+                'user_id' => Auth::id(),
+                'customer_id' => $deal->customer_id,
+                'team_id' => Auth::user()->getTeamId(),
+                'activity_type' => 'task',
+                'name' => 'Stage: ' . $stageLabel,
+                'description' => 'DEAL_STAGE_PROGRESS',
+                'priority' => 1,
+                'is_completed' => true,
+            ]);
+        }
+
+        // 2) Next action progress task (if user updated next action fields)
+        $newNextAction = $request->input('next_action');
+        $newNextActionDate = $request->input('next_action_date');
+
+        $hasNextAction = is_string($newNextAction) && trim($newNextAction) !== '' && $newNextActionDate;
+
+        if ($hasNextAction) {
+            $nextDue = now()->copy()->startOfDay();
+            try {
+                $nextDue = \Carbon\Carbon::parse((string) $newNextActionDate)->startOfDay();
+            } catch (\Throwable $e) {
+                $nextDue = now()->startOfDay();
+            }
+
+            $todayStart = now()->startOfDay();
+            $priority = $nextDue->lt($todayStart) ? 3 : ($nextDue->isSameDay($todayStart) ? 2 : 1);
+
+            // Close previous open progress-task for this deal
+            Activity::where('deal_id', $deal->id)
+                ->where('activity_type', 'task')
+                ->where('description', 'DEAL_PROGRESS_TASK')
+                ->where('is_completed', false)
+                ->update(['is_completed' => true]);
+
+            Activity::create([
+                'deal_id' => $deal->id,
+                'user_id' => Auth::id(),
+                'customer_id' => $deal->customer_id,
+                'team_id' => Auth::user()->getTeamId(),
+                'activity_type' => 'task',
+                'name' => $newNextAction,
+                'description' => 'DEAL_PROGRESS_TASK',
+                'priority' => $priority,
+                'is_completed' => false,
+            ]);
+        }
 
         return redirect()->route('pipeline-stages.index');
     }
