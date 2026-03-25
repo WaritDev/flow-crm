@@ -55,6 +55,12 @@ class DealController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+        $team = $user->team;
+        if (!$team && $user->organization) {
+            $team = $user->organization->teams()->first();
+        }
+
         $request->validate([
             'name' => 'required|string',
             'customer_id' => 'required|exists:customers,id',
@@ -66,6 +72,16 @@ class DealController extends Controller
             'expected_close_date' => 'nullable|date',
             'lost_reason' => 'nullable|string',
         ]);
+
+        if (!$team || !$team->pipelineTemplate) {
+            abort(403, 'No pipeline template found for this team.');
+        }
+
+        // Customer must belong to the current team (prevents creating deals for other teams)
+        $customer = Customer::findOrFail($request->customer_id);
+        if ((string) $customer->team_id !== (string) $user->getTeamId()) {
+            abort(403, 'Unauthorized customer for this team.');
+        }
 
         $stageId = $request->stage;
         $lostReason = null;
@@ -89,9 +105,7 @@ class DealController extends Controller
             }
 
             if (!$stageId) {
-                // Try to find ANY stage to satisfy FK constraint if specific team template fails
-                $fallbackStage = PipelineStage::first();
-                $stageId = $fallbackStage ? $fallbackStage->id : null;
+                abort(403, 'No pipeline stages found for this team.');
             }
 
             if (!$stageId) {
@@ -99,7 +113,10 @@ class DealController extends Controller
             }
         } else {
             // Check if selected stage is 'Won'
-            $stage = PipelineStage::find($request->stage);
+            $stage = PipelineStage::where('template_id', $team->pipelineTemplate->id)->find($request->stage);
+            if (!$stage) {
+                abort(403, 'Unauthorized stage for this team.');
+            }
             if ($stage && $stage->is_won) {
                 $wonAt = now();
             } else {
@@ -110,11 +127,13 @@ class DealController extends Controller
             }
         }
 
+        // At this point $stageId should be either a valid stage_id from this team,
+        // or resolved to the team's first stage when lost.
         $deal = Deal::create([
             'organization_id' => Auth::user()->getOrganizationId(),
             'team_id' => Auth::user()->getTeamId(),
             'user_id' => Auth::id(),
-            'customer_id' => $request->customer_id,
+            'customer_id' => $customer->id,
             'stage_id' => $stageId,
             'name' => $request->name,
             'value' => $request->value,
@@ -130,7 +149,7 @@ class DealController extends Controller
         Activity::create([
             'deal_id' => $deal->id,
             'user_id' => Auth::id(),
-            'customer_id' => $request->customer_id,
+            'customer_id' => $customer->id,
             'team_id' => Auth::user()->getTeamId(),
             'activity_type' => 'task',
             'name' => $request->next_action ?? 'Deal Created',
