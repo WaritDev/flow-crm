@@ -64,6 +64,9 @@ MAIL_MAILER=smtp
 MAIL_HOST=mailpit
 MAIL_PORT=1025
 
+# Mailpit รับ SMTP แค่ในคอนเทนเนอร์ — อีเมลไม่ออกอินเทอร์เน็ต เปิดดูที่ UI โฮสต์ (พอร์ต 8025 ตาม compose.yaml)
+# /register = ผู้จัดการเท่านั้น · Sales สมัครผ่านแอป (POST /register/sales) ด้วยรหัสเชิญองค์กร
+
 REDIS_HOST=redis
 
 ```
