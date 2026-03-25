@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Activity;
+use App\Models\Deal;
+use Illuminate\Support\Collection;
 
 class ActivityController extends Controller
 {
@@ -11,80 +14,140 @@ class ActivityController extends Controller
      */
     public function index()
     {
-            $activities = [
-                [
-                    'id' => 1,
-                    'priority' => 'urgent', // urgent, medium, normal
-                    'action_type' => 'ทัก LINE',
-                    'customer_nickname' => 'เจ',
-                    'customer_name' => 'คุณสมชาย วงศ์ดี',
-                    'title' => 'ส่งใบเสนอราคา Spa Package Premium',
-                    'warning' => 'ลูกค้าคลิกดูแค็ตตาล็อก 3 ครั้ง',
-                    'time' => '10:00',
-                    'amount' => 15000,
-                    'line_id' => '@somchai_j',
-                    'last_contact' => '2 วันที่แล้ว',
-                    'script' => 'สวัสดีครับคุณเจ ผมส่งใบเสนอราคา Spa Package Premium ให้ทางนี้นะครับ มีโปรโมชั่นพิเศษลด 20% ถึงสิ้นเดือนนี้ครับ'
-                ],
-                [
-                    'id' => 2,
-                    'priority' => 'urgent',
-                    'action_type' => 'Follow-up',
-                    'customer_nickname' => 'นก',
-                    'customer_name' => 'คุณนก ศรีสุข',
-                    'title' => 'นัดนวดหน้า Facial Treatment',
-                    'warning' => 'ลูกค้าทักมาแต่ยังไม่ได้ตอบ',
-                    'time' => '11:30',
-                    'amount' => 8500,
-                    'line_id' => '@nok_sri',
-                    'last_contact' => 'เมื่อวาน',
-                    'script' => 'สวัสดีครับคุณนก ไม่ทราบว่าสะดวกเข้ามานวดหน้าช่วงบ่ายวันเสาร์นี้ไหมครับ คิวว่างพอดีเลยครับ'
-                ],
-                [
-                    'id' => 3,
-                    'priority' => 'urgent',
-                    'action_type' => 'โทร',
-                    'customer_nickname' => 'พี่หนุ่ม',
-                    'customer_name' => 'คุณมานพ ธุรกิจดี',
-                    'title' => 'เสนอราคางานรับเหมาตกแต่งภายใน',
-                    'warning' => 'ดีลค้างเกิน 5 วัน',
-                    'time' => '13:00',
-                    'amount' => 250000,
-                    'line_id' => '@manop_biz',
-                    'last_contact' => '5 วันที่แล้ว',
-                    'script' => 'สวัสดีครับพี่หนุ่ม ผมขออนุญาตโทรติดตามเรื่องใบเสนอราคาตกแต่งภายในครับ ไม่ทราบว่าได้ดูรายละเอียดหรือยังครับ'
-                ],
-                [
-                    'id' => 4,
-                    'priority' => 'medium',
-                    'action_type' => 'ทัก LINE',
-                    'customer_nickname' => 'วิ',
-                    'customer_name' => 'คุณวิภา สวยงาม',
-                    'title' => 'แจ้งสินค้าพร้อมส่ง',
-                    'warning' => '',
-                    'time' => '14:00',
-                    'amount' => 3200,
-                    'line_id' => '@wipa_beauty',
-                    'last_contact' => '1 สัปดาห์ที่แล้ว',
-                    'script' => 'สวัสดีครับคุณวิ สินค้าเซรั่มที่สั่งจองไว้ ของเข้าแล้วนะครับ พร้อมจัดส่งวันนี้เลยครับ'
-                ],
-                [
-                    'id' => 5,
-                    'priority' => 'normal',
-                    'action_type' => 'ปิดการขาย',
-                    'customer_nickname' => 'ยุทธ',
-                    'customer_name' => 'คุณประยุทธ์ มั่งมี',
-                    'title' => 'ยืนยันออเดอร์และรับชำระเงิน',
-                    'warning' => 'ลูกค้ายืนยันใบเสนอราคา',
-                    'time' => '16:00',
-                    'amount' => 45000,
-                    'line_id' => '@yut_rich',
-                    'last_contact' => 'วันนี้',
-                    'script' => 'ขอบคุณครับคุณยุทธ รบกวนขอสลิปโอนเงินเพื่อยืนยันการจองคิวช่างนะครับ'
-                ],
-            ];
+        $user = request()->user();
+        $teamId = $user?->getTeamId();
 
-            return view('activities.index', compact('activities'));
+        if (!$teamId) {
+            abort(403, 'Missing team_id.');
+        }
+
+        $todayStart = now()->startOfDay();
+
+        $query = Activity::query()
+            ->where('team_id', $teamId)
+            ->where('is_completed', false)
+            ->with([
+                'customer',
+                'deal.customer.organization',
+                'deal.stage' ,
+                'deal.stage.lineScripts' => function ($q) use ($teamId) {
+                    $q->where('team_id', $teamId)->orderByDesc('use_count');
+                },
+            ]);
+
+        if ($user->role === 'sales') {
+            $query->where('user_id', $user->id);
+        }
+
+        /** @var Collection<int, array<string, mixed>> $activities */
+        $activities = $query
+            ->get()
+            ->map(function (Activity $a) use ($todayStart) {
+                $deal = $a->deal;
+                $customer = $a->customer;
+
+                $dueDate = $deal?->next_action_date;
+                $isOverdue = $dueDate ? $dueDate->lt($todayStart) : false;
+                $isToday = $dueDate ? $dueDate->isSameDay($todayStart) : false;
+                $bucketRank = $isOverdue ? 0 : ($isToday ? 1 : 2);
+
+                $priorityKey = match ((int) $a->priority) {
+                    3 => 'urgent',
+                    2 => 'medium',
+                    default => 'normal',
+                };
+
+                $actionType = match ($a->activity_type) {
+                    'call' => 'โทร',
+                    'message' => 'ข้อความ',
+                    'line' => 'ทัก',
+                    'meeting' => 'ประชุม',
+                    'email' => 'อีเมล',
+                    'note' => 'โน้ต',
+                    'task' => 'งานต่อไป',
+                    default => 'งานต่อไป',
+                };
+
+                $customerNickname = $customer?->nickname ?? $customer?->name ?? '-';
+                $customerName = $customer?->name ?? '-';
+
+                $warning = '';
+                if ($isOverdue) {
+                    $warning = 'เลยกำหนดแล้ว';
+                } elseif ($isToday) {
+                    $warning = 'ถึงกำหนดวันนี้';
+                }
+
+                $time = $a->created_at ? $a->created_at->format('H:i') : '-';
+                $amount = $deal?->value ? (int) $deal->value : 0;
+                $lineId = $customer?->line_id ?? null;
+                $lastContact = $deal?->updated_at ? $deal->updated_at->diffForHumans() : '-';
+
+                $scriptTemplate = $deal?->stage?->lineScripts?->first()?->content ?? '';
+                $script = str_replace(
+                    ['{nickname}', '{customer_name}', '{line_id}', '{amount}'],
+                    [
+                        (string) ($customer?->nickname ?? $customer?->name ?? ''),
+                        (string) ($customer?->name ?? ''),
+                        (string) ($customer?->line_id ?? ''),
+                        (string) $amount,
+                    ],
+                    $scriptTemplate
+                );
+
+                return [
+                    'id' => (int) $a->id,
+                    'priority' => $priorityKey,
+                    'priority_int' => (int) $a->priority,
+                    'bucket_rank' => $bucketRank,
+                    'due_date' => $dueDate ? $dueDate->toDateString() : null,
+                    'action_type' => $actionType,
+                    'customer_nickname' => $customerNickname,
+                    'customer_name' => $customerName,
+                    'title' => (string) ($a->name ?? ''),
+                    'warning' => $warning,
+                    'time' => $time,
+                    'amount' => $amount,
+                    'line_id' => $lineId,
+                    'last_contact' => $lastContact,
+                    'script' => $script,
+                ];
+            })
+            ->sort(function (array $x, array $y) {
+                if ($x['bucket_rank'] !== $y['bucket_rank']) {
+                    return $x['bucket_rank'] <=> $y['bucket_rank'];
+                }
+                // urgent -> medium -> normal
+                if ($x['priority_int'] !== $y['priority_int']) {
+                    return $y['priority_int'] <=> $x['priority_int'];
+                }
+                return strcmp((string) ($x['due_date'] ?? ''), (string) ($y['due_date'] ?? ''));
+            })
+            ->values()
+            ->all();
+
+        // กันหน้าแสดงผลพัง กรณี seed/ข้อมูลยังไม่พอ
+        if (count($activities) === 0) {
+            $activities = [[
+                'id' => 0,
+                'priority' => 'normal',
+                'priority_int' => 1,
+                'bucket_rank' => 2,
+                'due_date' => null,
+                'action_type' => 'งานต่อไป',
+                'customer_nickname' => '-',
+                'customer_name' => '-',
+                'title' => 'ไม่มีงานที่ต้องทำ',
+                'warning' => '',
+                'time' => '-',
+                'amount' => 0,
+                'line_id' => null,
+                'last_contact' => '-',
+                'script' => '',
+            ]];
+        }
+
+        return view('activities.index', compact('activities'));
     }
 
     /**

@@ -16,27 +16,57 @@ class LineScriptSeeder extends Seeder
     public function run(): void
     {
         $stages = PipelineStage::all();
-        $team = Team::first();
+        $teams = Team::all();
 
-        $scripts = [
-            'New Lead' => 'สวัสดีครับคุณ [nickname] ขอบคุณที่สนใจโครงการนะครับ มิต้องการข้อมูลส่วนไหนเพิ่มไหมครับ?',
-            'Site Visit' => 'คุณ [nickname] พรุ่งนี้เวลา 10 โมง สะดวกเจอกันที่โครงการไหมครับ? เดี๋ยวผมส่งโลเคชั่นให้นะครับ',
-            'Negotiation' => 'สรุปเงื่อนไขและโปรโมชั่นประจำเดือนที่คุณ [nickname] จะได้รับ ตามรูปภาพที่ส่งให้นี้นะครับ',
-        ];
+        foreach ($teams as $team) {
+            foreach ($stages as $stage) {
+                $content = $this->scriptForStage($stage->name);
 
-        foreach ($stages as $stage) {
-            foreach ($scripts as $key => $content) {
-                if (str_contains($stage->name, $key)) {
-                    LineScript::create(
-                        [
-                            'name' => $stage->name,
-                            'stage_id' => $stage->id,
-                            'team_id'  => $team->id,
-                            'content' => $content,
-                        ]
-                    );
+                if (!$content) {
+                    $content = 'สวัสดีครับคุณ {nickname} ผมขอส่งรายละเอียดเพิ่มเติมเกี่ยวกับดีลของคุณ (มูลค่าโดยประมาณ {amount} บาท) รบกวนยืนยันขั้นตอนถัดไปได้ไหมครับ? หากสะดวกสามารถตอบกลับผ่านไลน์นี้ได้เลย: {line_id}';
                 }
+
+                LineScript::updateOrCreate(
+                    [
+                        'stage_id' => $stage->id,
+                        'team_id' => $team->id,
+                    ],
+                    [
+                        'name' => $stage->name,
+                        'content' => $content,
+                        'use_count' => 0,
+                    ]
+                );
             }
         }
+    }
+
+    private function scriptForStage(string $stageName): ?string
+    {
+        if (str_contains($stageName, 'สนใจ') || str_contains($stageName, 'Prospect')) {
+            return 'สวัสดีครับคุณ {nickname} ขอบคุณที่สนใจโครงการครับ ผมขอข้อมูลเพิ่มเติม/นัดเวลาสั้นๆ ได้ไหมครับ? (ยอดดีลโดยประมาณ {amount} บาท) ถ้าสะดวกตอบกลับได้เลยผ่านไลน์นี้: {line_id}';
+        }
+
+        if (str_contains($stageName, 'ติดต่อแล้ว') || str_contains($stageName, 'Contacted')) {
+            return 'ขอบคุณครับคุณ {nickname} สำหรับการติดต่อ วันนี้ผมขอสรุปขั้นตอนต่อไปและนัดเวลาพูดคุยให้เหมาะกับคุณครับ ยอดดีลโดยประมาณ {amount} บาท รบกวนยืนยันเวลาที่สะดวกได้เลย: {line_id}';
+        }
+
+        if (str_contains($stageName, 'เสนอราคา') || str_contains($stageName, 'Quoted')) {
+            return 'สวัสดีครับคุณ {nickname} ผมส่งใบเสนอราคาให้แล้วนะครับ รบกวนตรวจสอบและบอกความคืบหน้าได้ไหมครับ? (มูลค่าประมาณ {amount} บาท) หากมีคำถามตอบกลับผ่านไลน์นี้ได้เลย: {line_id}';
+        }
+
+        if (str_contains($stageName, 'เจรจา') || str_contains($stageName, 'Negotiation')) {
+            return 'สวัสดีครับคุณ {nickname} เพื่อความชัดเจน ผมขอสรุปเงื่อนไข/โปรโมชั่นที่เหมาะกับคุณ {customer_name} อีกครั้งครับ ยอดดีลโดยประมาณ {amount} บาท รบกวนยืนยันเอกสารขั้นตอนถัดไปได้ไหมครับ: {line_id}';
+        }
+
+        if (str_contains($stageName, 'ปิดการขาย') || str_contains($stageName, 'Won')) {
+            return 'ยินดีด้วยครับคุณ {nickname} สำหรับขั้นตอนถัดไป ผมขอให้คุณยืนยันการเซ็นสัญญาและรับรายละเอียดการนัดหมายครับ ยอดดีลประมาณ {amount} บาท หากต้องการติดต่อเร่งด่วนตอบกลับไลน์นี้ได้เลย: {line_id}';
+        }
+
+        if (str_contains($stageName, 'สูญเสีย') || str_contains(mb_strtolower($stageName), 'lost')) {
+            return 'สวัสดีครับคุณ {nickname} ผมขออนุญาตติดตามหลังปิดดีลนะครับ หากยังสนใจบริการ/ข้อเสนอเดิม ผมสามารถส่งรายละเอียดและทางเลือกเพิ่มเติมให้ได้เลยครับ ติดต่อกลับผ่านไลน์นี้: {line_id}';
+        }
+
+        return null;
     }
 }
