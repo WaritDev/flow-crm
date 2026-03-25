@@ -12,9 +12,28 @@ class CustomerController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('customers.index');
+        $teamId = Auth::user()->current_team_id ?? 1;
+
+        $query = Customer::where('team_id', $teamId);
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('nickname', 'like', "%{$search}%")
+                    ->orWhere('line_id', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        $customers = $query->latest()->paginate(15);
+
+        return view('customers.index', compact('customers'));
     }
 
     /**
