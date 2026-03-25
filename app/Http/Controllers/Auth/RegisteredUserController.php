@@ -76,6 +76,6 @@ class RegisteredUserController extends Controller
             return view('auth.register-success', ['organization' => $createdOrg]);
         }
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('dashboard.index', absolute: false));
     }
 }

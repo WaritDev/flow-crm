@@ -28,7 +28,11 @@
             <div class="flex items-center gap-4">
                 @if (Route::has('login'))
                     @auth
-                        @if(auth()->user()->isManager())
+                        @if(auth()->user()->isAdmin())
+                            <a href="{{ route('organizations.index') }}" class="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors">
+                                Manage Organizations
+                            </a>
+                        @elseif(auth()->user()->isManager())
                             <a href="{{ route('teams.index') }}" class="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors">
                                 Manage Team
                             </a>
@@ -41,9 +45,8 @@
                         <a href="{{ route('login') }}" class="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors">
                             Log in
                         </a>
-
                         @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-all">
+                            <a href="{{ route('register') }}" class="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 transition-all">
                                 Get Started
                             </a>
                         @endif
@@ -72,9 +75,9 @@
 
                 <div class="mt-10 flex items-center justify-center gap-x-6">
                     @auth
-                        @if(auth()->user()->isManager())
-                            <a href="{{ route('users.index') }}" class="rounded-md bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-all">
-                                Go to Team Management
+                        @if(auth()->user()->isAdmin())
+                            <a href="{{ route('organizations.index') }}" class="rounded-md bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-all">
+                                Go to Organization Management
                             </a>
                         @else
                             <a href="{{ route('dashboard.index') }}" class="rounded-md bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-all">

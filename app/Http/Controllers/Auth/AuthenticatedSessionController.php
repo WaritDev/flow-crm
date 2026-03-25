@@ -40,7 +40,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         if ($user->role === 'manager') {
-            return redirect()->intended(route('teams.index'));
+            return redirect()->intended(route('dashboard.index'));
         }
 
         return redirect()->intended(route('dashboard.index'));

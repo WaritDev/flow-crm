@@ -92,4 +92,10 @@ class OrganizationController extends Controller
         $organization->delete();
         return redirect()->route('organizations.index')->with('success', 'Organization deleted successfully.');
     }
+
+    public function usersIndex()
+    {
+        $organizations = Organization::withCount('users')->latest()->paginate(9);
+        return view('organizations.users_index', compact('organizations'));
+    }
 }
