@@ -42,4 +42,12 @@ class Deal extends Model
     public function organization(): BelongsTo {
         return $this->belongsTo(Organization::class);
     }
+
+    public function deals(): HasMany {
+        return $this->hasMany(Deal::class, 'stage_id');
+    }
+
+    public function user(): BelongsTo {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

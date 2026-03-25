@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use App\Models\Target;
 
 class User extends Authenticatable
 {
@@ -73,5 +75,19 @@ class User extends Authenticatable
 
     public function getOrganizationId(): ?string {
         return $this->organization_id;
+    }
+
+    public function targets(): MorphMany
+    {
+        return $this->morphMany(Target::class, 'targetable');
+    }
+
+    public function currentMonthTarget($type = 'revenue')
+    {
+        return $this->targets()
+            ->where('month', now()->month)
+            ->where('year', now()->year)
+            ->where('type', $type)
+            ->first();
     }
 }
