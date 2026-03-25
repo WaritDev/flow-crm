@@ -44,4 +44,12 @@ return [
         'webhook_prefix' => env('N8N_WEBHOOK_PREFIX', '/webhook/'),
     ],
 
+    /*
+    | LINE inbound (n8n → Laravel): transcript rows stored in Redis lists keyed by org + LINE userId.
+    | Independent from n8n "Redis Chat Memory" key format; use the same LINE userId in both for consistency.
+    */
+    'line_inbound' => [
+        'conversation_ttl_seconds' => (int) env('LINE_INBOUND_CONVERSATION_TTL', 60 * 60 * 24 * 30),
+    ],
+
 ];

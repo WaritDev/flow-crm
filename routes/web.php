@@ -6,18 +6,18 @@ use App\Http\Controllers\Api\Sales\SalesCsrfController;
 use App\Http\Controllers\Api\Sales\SalesCustomersController as SalesCustomersApiController;
 use App\Http\Controllers\Api\Sales\SalesDealsController;
 use App\Http\Controllers\Api\Sales\SalesPipelineBoardController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DealController;
+use App\Http\Controllers\Integrations\N8nSetupController;
+use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\PipelineStageController;
 use App\Http\Controllers\PipelineTemplateController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\OrganizationController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\InvitationController;
-use App\Http\Controllers\Integrations\N8nSetupController;
 
 Route::get('/', function () {
     return view('index');
@@ -39,7 +39,6 @@ Route::middleware(['auth'])->group(function () {
 
     require __DIR__.'/sales_dashboard.php';
     require __DIR__.'/sales_activities.php';
-    require __DIR__.'/sales_n8n.php';
 });
 
 // -------------------- Existing routes --------------------
@@ -56,12 +55,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/deals/{id}/edit', [DealController::class, 'edit'])->name('deals.edit');
     Route::resource('deals', DealController::class);
     Route::get('/pipeline-templates', [PipelineTemplateController::class, 'index'])->name('pipeline-templates.index');
-//    Route::get('/pipelines-templates/create', [PipelineTemplateController::class, 'create'])->name('pipelines.create');
+    //    Route::get('/pipelines-templates/create', [PipelineTemplateController::class, 'create'])->name('pipelines.create');
     Route::post('/pipeline-templates/select', [PipelineTemplateController::class, 'select'])->name('pipeline-templates.select');
     Route::resource('pipeline-templates', PipelineTemplateController::class);
     Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
-//    Route::get('/activities/create', [ActivityController::class, 'create'])->name('activities.create');
-//    Route::get('/activities/{id}/edit', [ActivityController::class, 'edit'])->name('activities.edit');
+    //    Route::get('/activities/create', [ActivityController::class, 'create'])->name('activities.create');
+    //    Route::get('/activities/{id}/edit', [ActivityController::class, 'edit'])->name('activities.edit');
     Route::resource('activities', ActivityController::class);
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 

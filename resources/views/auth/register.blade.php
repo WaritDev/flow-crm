@@ -107,6 +107,7 @@
                             <p x-show="nameError" style="display: none;" class="text-sm text-red-600 font-medium animate-pulse mt-1">
                                 Please enter your First Name and Last Name.
                             </p>
+                            <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
 
                         <div>
