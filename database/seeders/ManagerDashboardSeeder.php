@@ -18,26 +18,32 @@ class ManagerDashboardSeeder extends Seeder
 {
     public function run(): void
     {
-        $org = Organization::create([
-            'name' => 'Kasetsart Innovation Hub',
-            'slug' => 'ku-innovation',
-            'size' => '11-50',
-            'invite_code' => 'KU-DEMO2026',
-            'description' => 'Web3 and Software Solutions provider',
-        ]);
+        $org = Organization::firstOrCreate(
+            ['slug' => 'ku-innovation'],
+            [
+                'name' => 'Kasetsart Innovation Hub',
+                'size' => '11-50',
+                'invite_code' => 'KU-DEMO2026',
+                'description' => 'Web3 and Software Solutions provider',
+            ]
+        );
 
         $now = Carbon::now();
         $monthsToGenerate = 3;
 
         for ($i = $monthsToGenerate; $i >= 0; $i--) {
             $date = $now->copy()->subMonths($i);
-            $org->targets()->create([
-                'amount' => rand(4500000, 6000000),
-                'type' => 'revenue',
-                'month' => $date->month,
-                'year' => $date->year,
-                'description' => 'เป้าหมายรายได้รวมบริษัทเดือน '.$date->format('M Y'),
-            ]);
+            $org->targets()->updateOrCreate(
+                [
+                    'month' => $date->month,
+                    'year' => $date->year,
+                    'type' => 'revenue',
+                ],
+                [
+                    'amount' => rand(4500000, 6000000),
+                    'description' => 'เป้าหมายรายได้รวมบริษัทเดือน '.$date->format('M Y'),
+                ]
+            );
         }
 
         $template = PipelineTemplate::query()
@@ -67,44 +73,66 @@ class ManagerDashboardSeeder extends Seeder
         }
         $stageModels[] = $lost;
 
-        $team = Team::create([
-            'name' => 'Core Sales Team',
-            'organization_id' => $org->id,
-            'template_id' => $template->id,
-        ]);
+        $team = Team::firstOrCreate(
+            [
+                'organization_id' => $org->id,
+                'name' => 'Core Sales Team',
+            ],
+            ['template_id' => $template->id]
+        );
+        if ((int) $team->template_id !== (int) $template->id) {
+            $team->update(['template_id' => $template->id]);
+        }
 
-        $manager = User::create([
-            'name' => 'Warit Manager',
-            'email' => 'manager@flowcrm.com',
-            'password' => Hash::make('password'),
-            'role' => 'manager',
-            'organization_id' => $org->id,
-        ]);
+        User::firstOrCreate(
+            ['email' => 'manager@flowcrm.com'],
+            [
+                'name' => 'Warit Manager',
+                'password' => Hash::make('password'),
+                'role' => 'manager',
+                'organization_id' => $org->id,
+            ]
+        );
 
         $salesNames = ['Alice', 'Bob', 'Charlie', 'David'];
         $salesReps = [];
         foreach ($salesNames as $name) {
-            $sales = User::create([
-                'name' => $name,
-                'email' => strtolower($name).'@flowcrm.com',
-                'password' => Hash::make('password'),
-                'role' => 'sales',
+            $sales = User::firstOrCreate(
+                ['email' => strtolower($name).'@flowcrm.com'],
+                [
+                    'name' => $name,
+                    'password' => Hash::make('password'),
+                    'role' => 'sales',
+                    'organization_id' => $org->id,
+                    'team_id' => $team->id,
+                ]
+            );
+            $sales->forceFill([
                 'organization_id' => $org->id,
                 'team_id' => $team->id,
-            ]);
+                'role' => 'sales',
+            ])->save();
 
             for ($i = $monthsToGenerate; $i >= 0; $i--) {
                 $date = $now->copy()->subMonths($i);
-                $sales->targets()->create([
-                    'amount' => rand(800000, 1500000),
-                    'type' => 'revenue',
-                    'month' => $date->month,
-                    'year' => $date->year,
-                    'description' => 'เป้าหมายยอดขายส่วนบุคคลเดือน '.$date->format('M Y'),
-                ]);
+                $sales->targets()->updateOrCreate(
+                    [
+                        'month' => $date->month,
+                        'year' => $date->year,
+                        'type' => 'revenue',
+                    ],
+                    [
+                        'amount' => rand(800000, 1500000),
+                        'description' => 'เป้าหมายยอดขายส่วนบุคคลเดือน '.$date->format('M Y'),
+                    ]
+                );
             }
 
             $salesReps[] = $sales;
+        }
+
+        if (Customer::query()->where('team_id', $team->id)->exists()) {
+            return;
         }
 
         foreach ($salesReps as $sales) {

@@ -9,6 +9,8 @@ use App\Models\Deal;
 use App\Models\PipelineStage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class SalesDealsController extends Controller
 {
@@ -140,6 +142,8 @@ class SalesDealsController extends Controller
             'stage_id' => ['required'],
         ]);
 
+        $fromStageId = $deal->stage_id;
+
         $stage = PipelineStage::findOrFail($request->input('stage_id'));
 
         $stageName = $stage->name ?? 'Unknown';
@@ -171,6 +175,28 @@ class SalesDealsController extends Controller
             'priority' => 1,
             'is_completed' => true,
         ]);
+
+        $followupUrl = config('services.n8n.followup_webhook_url');
+        if (is_string($followupUrl) && $followupUrl !== '') {
+            $deal->loadMissing('customer');
+            try {
+                Http::timeout(5)->post($followupUrl, [
+                    'event' => 'deal.stage_moved',
+                    'deal_id' => $deal->id,
+                    'customer_id' => $deal->customer_id,
+                    'line_id' => $deal->customer?->line_id,
+                    'organization_id' => $deal->organization_id,
+                    'team_id' => $deal->team_id,
+                    'from_stage_id' => $fromStageId,
+                    'to_stage_id' => $stage->id,
+                    'to_stage_name' => $stageName,
+                    'to_stage_is_won' => (bool) $stage->is_won,
+                    'is_lost_stage' => $isLostStage,
+                ]);
+            } catch (\Throwable $e) {
+                Log::warning('n8n follow-up webhook failed: '.$e->getMessage());
+            }
+        }
 
         return response()->json(['ok' => true]);
     }

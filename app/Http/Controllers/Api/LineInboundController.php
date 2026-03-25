@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use App\Models\Customer;
 use App\Models\Deal;
+use App\Models\User;
 use App\Services\LineInboundConversationStore;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -135,7 +136,9 @@ class LineInboundController extends Controller
 
         if (! $customer->exists) {
             $customer->team_id = $teamId;
-            $customer->user_id = $user->id;
+            // n8n calls this with an org-scoped service user (usually role=manager).
+            // Customers/Activities must be owned by a real sales user for Action Stream + Customers APIs.
+            $customer->user_id = $this->resolveSalesAssigneeUserId($orgId, $teamId, $user);
             $customer->name = $validated['name'] ?? 'LINE User';
         }
 
@@ -151,7 +154,7 @@ class LineInboundController extends Controller
             $customer->team_id = $teamId;
         }
         if (! $customer->user_id) {
-            $customer->user_id = $user->id;
+            $customer->user_id = $this->resolveSalesAssigneeUserId($orgId, $teamId, $user);
         }
 
         $customer->save();
@@ -170,10 +173,17 @@ class LineInboundController extends Controller
             abort(403, 'Missing organization.');
         }
 
+        // n8n often interpolates null deals as the literal string "null"
+        $rawDealId = $request->input('deal_id');
+        if ($rawDealId === 'null' || $rawDealId === '' || $rawDealId === 'undefined') {
+            $request->merge(['deal_id' => null]);
+        }
+
         $validated = $request->validate([
             'customer_id' => ['nullable', 'integer'],
             'line_user_id' => ['nullable', 'string', 'max:64'],
             'deal_id' => ['nullable', 'integer'],
+            'assignee_user_id' => ['nullable', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:2000'],
             'activity_type' => ['nullable', Rule::in(['call', 'message', 'line', 'meeting', 'note', 'email', 'task'])],
@@ -205,6 +215,7 @@ class LineInboundController extends Controller
         $priority = $this->resolvePriority($validated);
 
         $dealId = null;
+        $dealUserId = null;
         if (! empty($validated['deal_id'])) {
             $deal = Deal::query()
                 ->whereKey($validated['deal_id'])
@@ -216,12 +227,27 @@ class LineInboundController extends Controller
                 abort(403, 'Unauthorized deal.');
             }
             $dealId = (int) $deal->id;
+            $dealUserId = (int) $deal->user_id;
+        }
+
+        // Activity ownership must be aligned with the sales owner of the customer/deal,
+        // otherwise sales Action Stream will not show it (SalesActivitiesController filters by user_id).
+        $activityUserId = $dealUserId ?? (int) $customer->user_id;
+
+        if (! empty($validated['assignee_user_id'])) {
+            $assignee = User::query()
+                ->where('organization_id', $orgId)
+                ->where('team_id', $teamId)
+                ->whereKey((int) $validated['assignee_user_id'])
+                ->where('role', 'sales')
+                ->firstOrFail();
+            $activityUserId = (int) $assignee->id;
         }
 
         $activity = Activity::create([
             'deal_id' => $dealId,
             'customer_id' => $customer->id,
-            'user_id' => $user->id,
+            'user_id' => $activityUserId,
             'team_id' => $teamId,
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
@@ -324,5 +350,30 @@ class LineInboundController extends Controller
         }
 
         return 2;
+    }
+
+    private function resolveSalesAssigneeUserId(int $orgId, int $teamId, object $requester): int
+    {
+        if (($requester->role ?? null) === 'sales') {
+            return (int) $requester->id;
+        }
+
+        $sales = User::query()
+            ->where('organization_id', $orgId)
+            ->where('team_id', $teamId)
+            ->where('role', 'sales')
+            ->orderBy('id')
+            ->first();
+
+        // If the team has no sales member, fallback to any sales user in the org.
+        if (! $sales) {
+            $sales = User::query()
+                ->where('organization_id', $orgId)
+                ->where('role', 'sales')
+                ->orderBy('id')
+                ->first();
+        }
+
+        return $sales ? (int) $sales->id : (int) $requester->id;
     }
 }

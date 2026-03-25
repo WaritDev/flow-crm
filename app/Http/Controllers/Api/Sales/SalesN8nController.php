@@ -6,12 +6,97 @@ use App\Http\Controllers\Api\Concerns\ResolvesAutomationTeam;
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use App\Models\Deal;
+use App\Models\Team;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class SalesN8nController extends Controller
 {
     use ResolvesAutomationTeam;
+
+    /**
+     * Pipeline context for automation (n8n): current stage, ordered stages, suggested “next” stage
+     * (first stage after current with higher position and not won).
+     */
+    public function dealPipelineContext(Request $request, Deal $deal)
+    {
+        $user = $request->user();
+        Gate::authorize('view', $deal);
+
+        $deal->load(['stage', 'customer']);
+
+        $team = Team::query()
+            ->where('organization_id', $deal->organization_id)
+            ->whereKey($deal->team_id)
+            ->with(['pipelineTemplate.stages'])
+            ->firstOrFail();
+
+        $stages = $team->pipelineTemplate
+            ? $team->pipelineTemplate->stages->sortBy('position')->values()
+            : collect();
+
+        $current = $deal->stage;
+        $currentPosition = $current ? (int) $current->position : -1;
+
+        $nextStage = null;
+        foreach ($stages as $s) {
+            if ((int) $s->position > $currentPosition && ! $s->is_won) {
+                $nextStage = $s;
+                break;
+            }
+        }
+
+        $template = $team->pipelineTemplate;
+
+        return response()->json([
+            'deal_id' => (string) $deal->id,
+            'customer_id' => (string) $deal->customer_id,
+            'customer_name' => $deal->customer?->name,
+            'team_id' => (string) $deal->team_id,
+            'line_id' => $deal->customer?->line_id,
+            'customer' => [
+                'id' => (string) $deal->customer_id,
+                'name' => $deal->customer?->name,
+                'nickname' => $deal->customer?->nickname,
+                'line_id' => $deal->customer?->line_id,
+            ],
+            'deal' => [
+                'name' => $deal->name,
+                'value' => $deal->value !== null ? (float) $deal->value : null,
+                'currency' => $deal->currency,
+                'next_action' => $deal->next_action,
+                'next_action_date' => $deal->next_action_date ? $deal->next_action_date->toDateString() : null,
+            ],
+            'template' => $template ? [
+                'id' => (string) $template->id,
+                'name' => $template->name,
+                'industry' => $template->industry,
+                'description' => $template->description,
+            ] : null,
+            'current_stage' => $current ? [
+                'id' => (string) $current->id,
+                'name' => $current->name,
+                'position' => (int) $current->position,
+                'description' => $current->description,
+                'is_won' => (bool) $current->is_won,
+            ] : null,
+            'next_stage' => $nextStage ? [
+                'id' => (string) $nextStage->id,
+                'name' => $nextStage->name,
+                'position' => (int) $nextStage->position,
+                'description' => $nextStage->description,
+                'is_won' => (bool) $nextStage->is_won,
+            ] : null,
+            'stages' => $stages->map(fn ($s) => [
+                'id' => (string) $s->id,
+                'name' => $s->name,
+                'position' => (int) $s->position,
+                'description' => $s->description,
+                'is_won' => (bool) $s->is_won,
+            ])->values(),
+        ]);
+    }
 
     public function inactiveDeals(Request $request)
     {
@@ -97,11 +182,17 @@ class SalesN8nController extends Controller
         $computedPriority = $due->lt($todayStart) ? 3 : ($due->isSameDay($todayStart) ? 2 : 1);
         $priority = $priorityInput !== null ? (int) $priorityInput : $computedPriority;
 
-        Activity::create([
+        // Ownership: assign Activity to the sales user responsible for this deal.
+        // This ensures Sales Action Stream can see the tasks.
+        $activityUserId = (int) $deal->user_id;
+        // Always use the deal's team on the activity row (matches 403 check above).
+        $activityTeamId = (int) $deal->team_id;
+
+        $activity = Activity::create([
             'deal_id' => $deal->id,
             'customer_id' => $deal->customer_id,
-            'user_id' => $user->id,
-            'team_id' => $teamId,
+            'user_id' => $activityUserId,
+            'team_id' => $activityTeamId,
             'activity_type' => 'task',
             'name' => $nextAction,
             'description' => 'DEAL_PROGRESS_TASK',
@@ -110,6 +201,12 @@ class SalesN8nController extends Controller
             'created_at' => now(),
         ]);
 
-        return response()->json(['ok' => true]);
+        return response()->json([
+            'ok' => true,
+            'activity_id' => (string) $activity->id,
+            'deal_id' => (string) $deal->id,
+            'assigned_user_id' => (string) $activityUserId,
+            'team_id' => (string) $activityTeamId,
+        ]);
     }
 }

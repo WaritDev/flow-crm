@@ -42,6 +42,9 @@ return [
         'base_url' => env('N8N_URL', env('N8N_BASE_URL')),
         // Default n8n webhook prefix: /webhook/<path>
         'webhook_prefix' => env('N8N_WEBHOOK_PREFIX', '/webhook/'),
+        // Outbound: Laravel → n8n when a deal stage changes (Workflow 2 “Automated follow-up”).
+        // e.g. https://n8n.example/webhook/deal-stage-moved
+        'followup_webhook_url' => env('N8N_FOLLOWUP_WEBHOOK_URL'),
     ],
 
     /*

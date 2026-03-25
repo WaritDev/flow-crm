@@ -167,6 +167,28 @@ class SalesDashboardController extends Controller
         $revenueLastMonth = (float) $dealsLastMonth->sum('value');
         $revenueGrowth = $revenueLastMonth > 0 ? (($revenueMonth - $revenueLastMonth) / $revenueLastMonth) * 100 : 0;
 
+        $revenueToday = (float) Deal::query()
+            ->where('team_id', $teamId)
+            ->whereNotNull('won_at')
+            ->whereBetween('won_at', [$todayStart, $todayEnd])
+            ->when($user->isSales(), fn ($q) => $q->where('user_id', $user->id))
+            ->sum('value');
+
+        $targetRow = $user->isSales()
+            ? $user->currentMonthTarget('revenue')
+            : ($user->organization?->currentMonthTarget('revenue'));
+
+        $targetAmount = $targetRow ? (float) $targetRow->amount : 0.0;
+        $progressPercent = $targetAmount > 0
+            ? (int) min(100, round(($revenueMonth / $targetAmount) * 100))
+            : 0;
+
+        $daysInMonth = (int) $now->daysInMonth;
+        $dayOfMonth = (int) $now->day;
+        $paceAmountToday = $targetAmount > 0 && $daysInMonth > 0
+            ? $targetAmount * ($dayOfMonth / $daysInMonth)
+            : 0.0;
+
         $chartLabels = collect(range(0, 5))
             ->map(fn ($i) => $now->copy()->subMonths(5 - $i)->format('M'))
             ->values();
@@ -203,6 +225,16 @@ class SalesDashboardController extends Controller
                 'projected' => [],
             ],
             'activities' => $todayTasks,
+            'target_progress' => [
+                'has_target' => $targetAmount > 0,
+                'target_amount' => $targetAmount,
+                'achieved_amount' => $revenueMonth,
+                'progress_percent' => $progressPercent,
+                'revenue_today' => $revenueToday,
+                'pace_amount_by_today' => round($paceAmountToday, 2),
+                'period_month' => $now->month,
+                'period_year' => $now->year,
+            ],
         ]);
     }
 }
