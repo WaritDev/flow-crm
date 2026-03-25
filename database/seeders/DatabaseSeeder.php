@@ -23,5 +23,6 @@ class DatabaseSeeder extends Seeder
         $this->call(DealSeeder::class);
         $this->call(ActivitySeeder::class);
         $this->call(LineScriptSeeder::class);
+        $this->call(ManagerDashboardSeeder::class);
     }
 }
