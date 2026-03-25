@@ -16,7 +16,10 @@ class CustomerController extends Controller
     {
         $teamId = Auth::user()->current_team_id ?? 1;
 
-        $query = Customer::where('team_id', $teamId);
+        $query = Customer::where('team_id', $teamId)
+            ->withSum(['deals as lifetime_value' => function ($q) {
+                $q->whereNotNull('won_at');
+            }], 'value');
 
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -91,11 +94,11 @@ class CustomerController extends Controller
 
         $customer = Customer::with([
             'deals' => function ($query) {
-                $query->orderBy('created_at', 'desc');
+                $query->latest();
             },
             'deals.stage',
             'activities' => function ($query) {
-                $query->orderBy('created_at', 'desc');
+                $query->latest();
             },
             'activities.user'
         ])
