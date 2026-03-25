@@ -16,11 +16,11 @@ class SalesCustomersController extends Controller
         $user = $request->user();
 
         $team = $user->team;
-        if (!$team && $user->organization) {
+        if (! $team && $user->organization) {
             $team = $user->organization->teams()->first();
         }
 
-        if (!$team) {
+        if (! $team) {
             return response()->json([
                 'data' => [],
                 'total' => 0,
@@ -47,7 +47,7 @@ class SalesCustomersController extends Controller
         }
 
         if ($search !== '') {
-            $like = '%' . $search . '%';
+            $like = '%'.$search.'%';
             $query->where(function ($q) use ($like) {
                 $q->where('name', 'like', $like)
                     ->orWhere('nickname', 'like', $like)
@@ -67,6 +67,9 @@ class SalesCustomersController extends Controller
                 'id' => (int) $c->id,
                 'name' => $c->name,
                 'nickname' => $c->nickname,
+                'line_id' => $c->line_id,
+                'phone_num' => $c->phone_num,
+                'province' => $c->province,
                 'is_active' => $c->status === 'active',
                 'lifetime_value' => (float) $lifetimeValue,
                 'organization_name' => $c->organization?->name,
@@ -81,20 +84,20 @@ class SalesCustomersController extends Controller
         $user = $request->user();
 
         $team = $user->team;
-        if (!$team && $user->organization) {
+        if (! $team && $user->organization) {
             $team = $user->organization->teams()->first();
         }
 
-        if (!$team) {
+        if (! $team) {
             abort(403, 'No team found for this user.');
         }
 
         $organizationId = $team->organization_id ?? $user->getOrganizationId();
-        if (!$organizationId) {
+        if (! $organizationId) {
             abort(403, 'Missing organization_id for this team.');
         }
 
-        if (!in_array($user->role, ['sales', 'manager'], true)) {
+        if (! in_array($user->role, ['sales', 'manager'], true)) {
             abort(403, 'Unauthorized.');
         }
 
@@ -118,7 +121,7 @@ class SalesCustomersController extends Controller
             $tags = array_values(array_filter(array_map(fn ($t) => trim($t), $parts)));
         }
 
-        $customer = new Customer();
+        $customer = new Customer;
         $customer->team_id = $team->id;
         $customer->user_id = $user->id;
         $customer->organization_id = $organizationId;
@@ -195,6 +198,7 @@ class SalesCustomersController extends Controller
                     ->get()
                     ->map(function ($a) {
                         $u = $a->user_id ? \App\Models\User::find($a->user_id) : null;
+
                         return [
                             'id' => (string) $a->id,
                             'title' => $a->name,
@@ -237,6 +241,7 @@ class SalesCustomersController extends Controller
             ->get()
             ->map(function ($a) {
                 $u = $a->user_id ? \App\Models\User::find($a->user_id) : null;
+
                 return [
                     'id' => (string) $a->id,
                     'title' => $a->name,
@@ -331,4 +336,3 @@ class SalesCustomersController extends Controller
         return response()->json(['ok' => true]);
     }
 }
-

@@ -17,7 +17,7 @@ class SalesDealsController extends Controller
         $user = $request->user();
         $team = $user->team;
 
-        if (!$team && $user->organization) {
+        if (! $team && $user->organization) {
             $team = $user->organization->teams()->first();
         }
 
@@ -27,7 +27,7 @@ class SalesDealsController extends Controller
             ->map(function (Customer $c) {
                 return [
                     'id' => (string) $c->id,
-                    'label' => "{$c->name} ({$c->nickname}) - {$c->line_id}",
+                    'label' => (string) $c->name,
                     'name' => $c->name,
                     'nickname' => $c->nickname,
                 ];
@@ -54,7 +54,7 @@ class SalesDealsController extends Controller
         Gate::authorize('view', $deal);
 
         $team = $user->team;
-        if (!$team && $user->organization) {
+        if (! $team && $user->organization) {
             $team = $user->organization->teams()->first();
         }
 
@@ -66,7 +66,7 @@ class SalesDealsController extends Controller
         $customers = Customer::all()->map(function (Customer $c) {
             return [
                 'id' => (string) $c->id,
-                'label' => "{$c->name} ({$c->nickname}) - {$c->line_id}",
+                'label' => (string) $c->name,
                 'name' => $c->name,
                 'nickname' => $c->nickname,
             ];
@@ -79,6 +79,7 @@ class SalesDealsController extends Controller
             ->get()
             ->map(function ($a) {
                 $u = $a->user_id ? \App\Models\User::find($a->user_id) : null;
+
                 return [
                     'id' => (string) $a->id,
                     'title' => $a->name,
@@ -165,7 +166,7 @@ class SalesDealsController extends Controller
             'user_id' => $user?->id ?? 0,
             'team_id' => $user?->getTeamId(),
             'activity_type' => 'task',
-            'name' => 'Stage: ' . ($isLostStage ? 'Lost' : $stageName),
+            'name' => 'Stage: '.($isLostStage ? 'Lost' : $stageName),
             'description' => 'DEAL_STAGE_PROGRESS',
             'priority' => 1,
             'is_completed' => true,
@@ -174,4 +175,3 @@ class SalesDealsController extends Controller
         return response()->json(['ok' => true]);
     }
 }
-

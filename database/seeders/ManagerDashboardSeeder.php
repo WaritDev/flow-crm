@@ -13,7 +13,6 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class ManagerDashboardSeeder extends Seeder
 {
@@ -23,7 +22,7 @@ class ManagerDashboardSeeder extends Seeder
             'name' => 'Kasetsart Innovation Hub',
             'slug' => 'ku-innovation',
             'size' => '11-50',
-            'invite_code' => 'KU-' . strtoupper(Str::random(6)),
+            'invite_code' => 'KU-DEMO2026',
             'description' => 'Web3 and Software Solutions provider',
         ]);
 
@@ -33,38 +32,40 @@ class ManagerDashboardSeeder extends Seeder
         for ($i = $monthsToGenerate; $i >= 0; $i--) {
             $date = $now->copy()->subMonths($i);
             $org->targets()->create([
-                'amount' => rand(4500000, 6000000), 
+                'amount' => rand(4500000, 6000000),
                 'type' => 'revenue',
                 'month' => $date->month,
                 'year' => $date->year,
-                'description' => 'เป้าหมายรายได้รวมบริษัทเดือน ' . $date->format('M Y')
+                'description' => 'เป้าหมายรายได้รวมบริษัทเดือน '.$date->format('M Y'),
             ]);
         }
 
-        $template = PipelineTemplate::create([
-            'name' => 'Standard Sales Process',
-            'industry' => 'Software',
-            'is_default' => true
-        ]);
+        $template = PipelineTemplate::query()
+            ->whereNull('organization_id')
+            ->where('name', 'SaaS — Subscription sales')
+            ->first()
+            ?? PipelineTemplate::query()
+                ->whereNull('organization_id')
+                ->where('name', 'Default Pipeline')
+                ->firstOrFail();
 
-        $stages = [
-            ['name' => 'สนใจ (Prospect)', 'is_won' => false, 'pos' => 1],
-            ['name' => 'ติดต่อแล้ว (Contacted)', 'is_won' => false, 'pos' => 2],
-            ['name' => 'เสนอราคา (Quoted)', 'is_won' => false, 'pos' => 3],
-            ['name' => 'เจรจาต่อรอง (Negotiation)', 'is_won' => false, 'pos' => 4],
-            ['name' => 'ปิดการขาย (Won)', 'is_won' => true, 'pos' => 5],
-            ['name' => 'สูญเสีย (Lost)', 'is_won' => false, 'pos' => 6],
-        ];
+        $template->load(['stages' => fn ($q) => $q->orderBy('position')]);
+        $stageModels = $template->stages->all();
 
-        $stageModels = [];
-        foreach ($stages as $s) {
-            $stageModels[] = PipelineStage::create([
+        $lost = PipelineStage::query()
+            ->where('template_id', $template->id)
+            ->where('name', 'like', '%Lost%')
+            ->first();
+
+        if (! $lost) {
+            $lost = PipelineStage::create([
                 'template_id' => $template->id,
-                'name' => $s['name'],
-                'position' => $s['pos'],
-                'is_won' => $s['is_won'],
+                'name' => 'สูญเสีย (Lost)',
+                'position' => $template->stages->max('position') + 1,
+                'is_won' => false,
             ]);
         }
+        $stageModels[] = $lost;
 
         $team = Team::create([
             'name' => 'Core Sales Team',
@@ -85,7 +86,7 @@ class ManagerDashboardSeeder extends Seeder
         foreach ($salesNames as $name) {
             $sales = User::create([
                 'name' => $name,
-                'email' => strtolower($name) . '@flowcrm.com',
+                'email' => strtolower($name).'@flowcrm.com',
                 'password' => Hash::make('password'),
                 'role' => 'sales',
                 'organization_id' => $org->id,
@@ -99,7 +100,7 @@ class ManagerDashboardSeeder extends Seeder
                     'type' => 'revenue',
                     'month' => $date->month,
                     'year' => $date->year,
-                    'description' => 'เป้าหมายยอดขายส่วนบุคคลเดือน ' . $date->format('M Y')
+                    'description' => 'เป้าหมายยอดขายส่วนบุคคลเดือน '.$date->format('M Y'),
                 ]);
             }
 
@@ -153,7 +154,7 @@ class ManagerDashboardSeeder extends Seeder
                         'user_id' => $sales->id,
                         'team_id' => $team->id,
                         'stage_id' => $randomStage->id,
-                        'name' => 'Deal for ' . $customer->name,
+                        'name' => 'Deal for '.$customer->name,
                         'value' => rand(30000, 450000),
                         'expected_close_date' => $dealDate->copy()->addDays(rand(10, 45)),
                         'next_action' => $nextAction,
@@ -174,7 +175,7 @@ class ManagerDashboardSeeder extends Seeder
                         'customer_id' => $customer->id,
                         'user_id' => $sales->id,
                         'team_id' => $team->id,
-                        'name' => 'Stage: ' . $stageLabel,
+                        'name' => 'Stage: '.$stageLabel,
                         'activity_type' => 'task',
                         'priority' => 1,
                         'is_completed' => true,
@@ -202,11 +203,11 @@ class ManagerDashboardSeeder extends Seeder
                         'customer_id' => $customer->id,
                         'user_id' => $sales->id,
                         'team_id' => $team->id,
-                        'name' => 'Follow up with ' . $customer->nickname,
+                        'name' => 'Follow up with '.$customer->nickname,
                         'activity_type' => ['call', 'line', 'meeting', 'email'][rand(0, 3)],
                         'priority' => rand(1, 3),
                         'is_completed' => true,
-                        'created_at' => $dealDate->copy()->addDays(rand(0, 10)), 
+                        'created_at' => $dealDate->copy()->addDays(rand(0, 10)),
                     ]);
                 }
             }

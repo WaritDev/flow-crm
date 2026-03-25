@@ -2,69 +2,76 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
+use App\Models\Organization;
 use App\Models\Team;
 use App\Models\User;
-use App\Models\Organization;
+use Illuminate\Database\Seeder;
+
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $team1 = Team::where('organization_id', 1)->first();
-        $team2 = Team::where('organization_id', 2)->first();
+        $org1 = Organization::query()->where('slug', 'clinic-s')->firstOrFail();
+        $org2 = Organization::query()->where('slug', 'mala-a')->firstOrFail();
 
-        // Admin
-        User::create([
-            'name' => 'ผู้ดูแลระบบ',
-            'email' => 'admin@flowcrm.com',
-            'password' => bcrypt('password'),
-            'role' => 'admin',
-        ]);
+        $team1 = Team::query()->where('organization_id', $org1->id)->orderBy('id')->firstOrFail();
+        $team2 = Team::query()->where('organization_id', $org2->id)->orderBy('id')->firstOrFail();
 
-        // Manager
-        User::create([
-            'organization_id' => 1,
-            'team_id' => $team1->id,
-            'name' => 'Somchai Yachai',
-            'email' => 'manager@org1.com',
-            'password' => bcrypt('password'),
-            'role' => 'manager'
-        ]);
-
-        User::create([
-            'organization_id' => 2,
-            'team_id' => $team2->id,
-            'name' => 'Anusit Srikirin',
-            'email' => 'manager@org2.com',
-            'password' => bcrypt('password'),
-            'role' => 'manager'
-        ]);
-
-        // sales (use Fake kub P)
-        for ($i = 1; $i <= 4; $i++) {
-            User::create([
-                'organization_id' => 1,
-                'name' => fake()->firstName() . ' ' . fake()->lastName(),
-                'email' => "sales$i@org1.com",
+        User::firstOrCreate(
+            ['email' => 'admin@flowcrm.com'],
+            [
+                'name' => 'ผู้ดูแลระบบ',
                 'password' => bcrypt('password'),
-                'role' => 'sales',
-                'team_id' => $team1->id
-            ]);
+                'role' => 'admin',
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'manager@org1.com'],
+            [
+                'organization_id' => $org1->id,
+                'team_id' => $team1->id,
+                'name' => 'Somchai Yachai',
+                'password' => bcrypt('password'),
+                'role' => 'manager',
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'manager@org2.com'],
+            [
+                'organization_id' => $org2->id,
+                'team_id' => $team2->id,
+                'name' => 'Anusit Srikirin',
+                'password' => bcrypt('password'),
+                'role' => 'manager',
+            ]
+        );
+
+        for ($i = 1; $i <= 4; $i++) {
+            User::firstOrCreate(
+                ['email' => "sales$i@org1.com"],
+                [
+                    'organization_id' => $org1->id,
+                    'name' => fake()->firstName().' '.fake()->lastName(),
+                    'password' => bcrypt('password'),
+                    'role' => 'sales',
+                    'team_id' => $team1->id,
+                ]
+            );
         }
 
         for ($i = 1; $i <= 4; $i++) {
-            User::create([
-                'organization_id' => 2,
-                'name' => fake()->firstName() . ' ' . fake()->lastName(),
-                'email' => "sales$i@org2.com",
-                'password' => bcrypt('password'),
-                'role' => 'sales',
-                'team_id' => $team2->id
-            ]);
+            User::firstOrCreate(
+                ['email' => "sales$i@org2.com"],
+                [
+                    'organization_id' => $org2->id,
+                    'name' => fake()->firstName().' '.fake()->lastName(),
+                    'password' => bcrypt('password'),
+                    'role' => 'sales',
+                    'team_id' => $team2->id,
+                ]
+            );
         }
     }
 }

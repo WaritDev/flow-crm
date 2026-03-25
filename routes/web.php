@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Sales\SalesCsrfController;
 use App\Http\Controllers\Api\Sales\SalesCustomersController as SalesCustomersApiController;
 use App\Http\Controllers\Api\Sales\SalesDealsController;
 use App\Http\Controllers\Api\Sales\SalesPipelineBoardController;
+use App\Http\Controllers\Api\Sales\SalesPipelineTemplatesController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DealController;
@@ -37,6 +38,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api/sales/customers/{customer}', [SalesCustomersApiController::class, 'show']);
     Route::put('/api/sales/customers/{customer}', [SalesCustomersApiController::class, 'update']);
 
+    Route::get('/api/sales/pipeline-templates', [SalesPipelineTemplatesController::class, 'index']);
+    Route::get('/api/sales/pipeline-templates/teams', [SalesPipelineTemplatesController::class, 'teams']);
+
     require __DIR__.'/sales_dashboard.php';
     require __DIR__.'/sales_activities.php';
 });
@@ -54,10 +58,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/deals/create', [DealController::class, 'create'])->name('deals.create');
     Route::get('/deals/{id}/edit', [DealController::class, 'edit'])->name('deals.edit');
     Route::resource('deals', DealController::class);
-    Route::get('/pipeline-templates', [PipelineTemplateController::class, 'index'])->name('pipeline-templates.index');
-    //    Route::get('/pipelines-templates/create', [PipelineTemplateController::class, 'create'])->name('pipelines.create');
-    Route::post('/pipeline-templates/select', [PipelineTemplateController::class, 'select'])->name('pipeline-templates.select');
-    Route::resource('pipeline-templates', PipelineTemplateController::class);
     Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
     //    Route::get('/activities/create', [ActivityController::class, 'create'])->name('activities.create');
     //    Route::get('/activities/{id}/edit', [ActivityController::class, 'edit'])->name('activities.edit');
@@ -75,6 +75,15 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::middleware(['role:manager'])->group(function () {
+        Route::post('/pipeline-templates/select', [PipelineTemplateController::class, 'select'])->name('pipeline-templates.select');
+        Route::resource('pipeline-templates', PipelineTemplateController::class);
+
+        Route::post('/api/sales/pipeline-templates/assign-team', [SalesPipelineTemplatesController::class, 'assignTeam']);
+        Route::post('/api/sales/pipeline-templates', [SalesPipelineTemplatesController::class, 'store']);
+        Route::get('/api/sales/pipeline-templates/{pipelineTemplate}', [SalesPipelineTemplatesController::class, 'show']);
+        Route::put('/api/sales/pipeline-templates/{pipelineTemplate}', [SalesPipelineTemplatesController::class, 'update']);
+        Route::delete('/api/sales/pipeline-templates/{pipelineTemplate}', [SalesPipelineTemplatesController::class, 'destroy']);
+
         Route::resource('teams', TeamController::class);
         Route::post('/teams/{team}/members', [TeamController::class, 'addMember'])->name('teams.add_member');
         Route::delete('/teams/members/{user}', [TeamController::class, 'removeMember'])->name('teams.remove_member');

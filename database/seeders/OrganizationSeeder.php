@@ -2,54 +2,58 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Organization;
-use App\Models\User;
+use App\Models\PipelineTemplate;
 use App\Models\Team;
+use Illuminate\Database\Seeder;
 
 class OrganizationSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $orgA = Organization::create([
-            'id' => 1,
-            'name' => 'Somhai Clinic',
-            'slug' => 'clinic-s',
-            'size' => 'medium',
-            'description' => 'คลินิกความงามชั้นนำในกรุงเทพฯ ให้บริการครบวงจร',
-            'invite_code' => 'CLINICA2026'
-        ]);
-        $orgB = Organization::create([
-            'id' => 2,
-            'name' => 'Aunsit Mala',
-            'slug' => 'mala-a',
-            'size' => 'small',
-            'description' => 'คลินิกความงามบูติก มุ่งเน้นการบริการส่วนบุคคล',
-            'invite_code' => 'CLINICB2026'
-        ]);
+        $orgA = Organization::updateOrCreate(
+            ['slug' => 'clinic-s'],
+            [
+                'name' => 'Somhai Clinic',
+                'size' => 'medium',
+                'description' => 'คลินิกความงามชั้นนำในกรุงเทพฯ ให้บริการครบวงจร',
+                'invite_code' => 'CLINICA2026',
+            ]
+        );
 
+        $orgB = Organization::updateOrCreate(
+            ['slug' => 'mala-a'],
+            [
+                'name' => 'Aunsit Mala',
+                'size' => 'small',
+                'description' => 'คลินิกความงามบูติก มุ่งเน้นการบริการส่วนบุคคล',
+                'invite_code' => 'CLINICB2026',
+            ]
+        );
 
         $this->seedOrganizationData($orgA);
         $this->seedOrganizationData($orgB);
     }
 
-    private function seedOrganizationData($org)
+    private function seedOrganizationData(Organization $org): void
     {
-        $template = \App\Models\PipelineTemplate::firstOrCreate([
-            'name' => 'Default Pipeline'
-        ]);
+        $template = PipelineTemplate::query()
+            ->whereNull('organization_id')
+            ->where('name', 'Default Pipeline')
+            ->firstOrFail();
 
-        $team = Team::create([
-            'organization_id' => $org->id,
-            'name' => 'main sales team',
-            'template_id' => $template->id
-        ]);
+        $team = Team::firstOrCreate(
+            [
+                'organization_id' => $org->id,
+                'name' => 'main sales team',
+            ],
+            ['template_id' => $template->id]
+        );
 
-        // Ensure template has stages if it was just created (fallback)
+        if ($team->template_id === null) {
+            $team->update(['template_id' => $template->id]);
+        }
+
         if ($template->stages()->count() === 0) {
             $stages = [
                 ['name' => 'สนใจ (Prospect)', 'position' => 1, 'is_won' => false],

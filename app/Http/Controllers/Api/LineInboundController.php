@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Api\Concerns\ResolvesAutomationTeam;
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use App\Models\Customer;
 use App\Models\Deal;
-use App\Models\Team;
 use App\Services\LineInboundConversationStore;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class LineInboundController extends Controller
 {
+    use ResolvesAutomationTeam;
+
     public function __construct(
         private LineInboundConversationStore $conversations,
     ) {}
@@ -28,15 +30,13 @@ class LineInboundController extends Controller
             abort(403, 'Missing organization.');
         }
 
-        $teamId = $user->getTeamId();
-        if (! $teamId) {
-            abort(403, 'Missing team_id.');
-        }
-
         $validated = $request->validate([
             'line_user_id' => ['required', 'string', 'max:64'],
             'hours' => ['nullable', 'integer', 'min:1', 'max:720'],
+            'team_id' => ['nullable', 'integer'],
         ]);
+
+        $teamId = $this->resolveAutomationTeamId($user, $request, $orgId);
 
         $hours = (int) ($validated['hours'] ?? 48);
         $cutoff = now()->subHours(max($hours, 1));
@@ -126,7 +126,7 @@ class LineInboundController extends Controller
             'team_id' => ['nullable', 'integer'],
         ]);
 
-        $teamId = $this->resolveTeamId($user, $request, $orgId);
+        $teamId = $this->resolveAutomationTeamId($user, $request, $orgId);
 
         $customer = Customer::firstOrNew([
             'organization_id' => $orgId,
@@ -302,36 +302,6 @@ class LineInboundController extends Controller
         $rows = $this->conversations->all($orgId, $validated['line_user_id']);
 
         return response()->json(['messages' => $rows]);
-    }
-
-    private function resolveTeamId(object $user, Request $request, int $orgId): int
-    {
-        $incoming = $request->input('team_id');
-        if ($incoming !== null && $incoming !== '') {
-            $team = Team::query()
-                ->where('organization_id', $orgId)
-                ->whereKey((int) $incoming)
-                ->firstOrFail();
-
-            return (int) $team->id;
-        }
-
-        if ($user->team_id) {
-            $team = Team::query()
-                ->where('organization_id', $orgId)
-                ->whereKey((int) $user->team_id)
-                ->first();
-            if ($team) {
-                return (int) $team->id;
-            }
-        }
-
-        $first = Team::query()->where('organization_id', $orgId)->orderBy('id')->first();
-        if (! $first) {
-            abort(422, 'No team in organization; create a team first.');
-        }
-
-        return (int) $first->id;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Sales;
 
+use App\Http\Controllers\Api\Concerns\ResolvesAutomationTeam;
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use App\Models\Deal;
@@ -10,14 +11,17 @@ use Illuminate\Http\Request;
 
 class SalesN8nController extends Controller
 {
+    use ResolvesAutomationTeam;
+
     public function inactiveDeals(Request $request)
     {
         $user = $request->user();
-        $teamId = $user->getTeamId();
-
-        if (!$teamId) {
-            abort(403, 'Missing team_id.');
+        $orgId = (int) $user->organization_id;
+        if (! $orgId) {
+            abort(403, 'Missing organization.');
         }
+
+        $teamId = $this->resolveAutomationTeamId($user, $request, $orgId);
 
         $hours = (int) $request->query('hours', 48);
         $cutoff = now()->subHours(max($hours, 1));
@@ -53,11 +57,12 @@ class SalesN8nController extends Controller
     public function upsertNextAction(Request $request, Deal $deal)
     {
         $user = $request->user();
-        $teamId = $user->getTeamId();
-
-        if (!$teamId) {
-            abort(403, 'Missing team_id.');
+        $orgId = (int) $user->organization_id;
+        if (! $orgId) {
+            abort(403, 'Missing organization.');
         }
+
+        $teamId = $this->resolveAutomationTeamId($user, $request, $orgId);
 
         if ((string) $deal->team_id !== (string) $teamId) {
             abort(403, 'Unauthorized.');
@@ -108,4 +113,3 @@ class SalesN8nController extends Controller
         return response()->json(['ok' => true]);
     }
 }
-

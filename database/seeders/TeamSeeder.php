@@ -2,21 +2,41 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
+use App\Models\Organization;
 use App\Models\PipelineTemplate;
 use App\Models\Team;
-use App\Models\Organization;
+use Illuminate\Database\Seeder;
 
 class TeamSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $template = PipelineTemplate::first();
-        Team::create(['organization_id' => 1, 'name' => 'bangkok sales team', 'template_id' => $template->id]);
-        Team::create(['organization_id' => 2, 'name' => 'online sales team', 'template_id' => $template->id]);
+        $template = PipelineTemplate::query()
+            ->whereNull('organization_id')
+            ->where('name', 'Default Pipeline')
+            ->firstOrFail();
+
+        $org1 = Organization::query()->where('slug', 'clinic-s')->first();
+        $org2 = Organization::query()->where('slug', 'mala-a')->first();
+
+        if ($org1) {
+            Team::firstOrCreate(
+                [
+                    'organization_id' => $org1->id,
+                    'name' => 'bangkok sales team',
+                ],
+                ['template_id' => $template->id]
+            );
+        }
+
+        if ($org2) {
+            Team::firstOrCreate(
+                [
+                    'organization_id' => $org2->id,
+                    'name' => 'online sales team',
+                ],
+                ['template_id' => $template->id]
+            );
+        }
     }
 }

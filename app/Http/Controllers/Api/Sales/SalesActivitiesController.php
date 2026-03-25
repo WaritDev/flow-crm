@@ -76,8 +76,8 @@ class SalesActivitiesController extends Controller
                     default => 'Task',
                 };
 
-                $customerNickname = $customer?->nickname ?? $customer?->name ?? '';
-                $customerName = $customer?->name ?? '';
+                $customerNickname = (string) ($customer?->nickname ?? '');
+                $customerName = (string) ($customer?->name ?? '');
 
                 $warning = $isOverdue ? 'เลยกำหนดแล้ว' : '';
 

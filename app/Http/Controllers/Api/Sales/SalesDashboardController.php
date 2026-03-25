@@ -111,7 +111,7 @@ class SalesDashboardController extends Controller
                     'priority' => (int) $a->priority,
                     'priority_label' => $priorityLabel,
                     'action_type' => $actionType,
-                    'customer_name' => (string) ($customer?->name ?? $customer?->nickname ?? ''),
+                    'customer_name' => (string) ($customer?->name ?? ''),
                     'customer_nickname' => (string) ($customer?->nickname ?? ''),
                     'title' => (string) ($a->name ?? ''),
                     'description' => $a->description,

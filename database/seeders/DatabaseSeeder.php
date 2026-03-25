@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -24,5 +23,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ActivitySeeder::class);
         $this->call(LineScriptSeeder::class);
         $this->call(ManagerDashboardSeeder::class);
+        $this->call(DemoFlowSeeder::class);
     }
 }
