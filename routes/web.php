@@ -268,6 +268,9 @@ Route::middleware(['auth'])->group(function () {
 
         // Invitation Management
         Route::post('/invitations', [InvitationController::class, 'store'])->name('invitations.store');
+
+        // Dashboard Targets Update
+        Route::post('/dashboard/targets', [DashboardController::class, 'updateTargets'])->name('targets.update');
     });
 
     // Admin
