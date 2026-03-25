@@ -1,13 +1,36 @@
 @extends('layouts.app')
 
-@section('content')
+@section('content')    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <div class="space-y-8">
-
         @if(session('success'))
-            <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 flex items-center gap-2" role="alert">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span class="font-medium">Success!</span> {{ session('success') }}
+            <div 
+                x-data="{ show: true }" 
+                x-init="setTimeout(() => show = false, 3000)" 
+                x-show="show"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 transform translate-y-8"
+                x-transition:enter-end="opacity-100 transform translate-y-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed bottom-5 right-5 z-[100] max-w-sm w-full bg-white border border-slate-200 shadow-2xl rounded-2xl p-4 flex items-center gap-4 ring-1 ring-black/5"
+            >
+                <div class="flex-shrink-0 bg-emerald-500 p-2 rounded-xl shadow-lg shadow-emerald-200">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h4 class="text-sm font-bold text-slate-900">Success!</h4>
+                    <p class="text-xs text-slate-500 mt-0.5">{{ session('success') }}</p>
+                </div>
+                <button @click="show = false" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
             </div>
         @endif
 
@@ -31,10 +54,10 @@
                 <div class="bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col h-full hover:shadow-md transition-shadow duration-200 group/card">
 
                     <div class="p-4 border-b border-slate-100 bg-slate-50 rounded-t-xl"
-                         x-data="{
-                             isEditing: false,
-                             focusInput() { $nextTick(() => { $refs.nameInput.focus(); }); }
-                         }">
+                        x-data="{
+                            isEditing: false,
+                            focusInput() { $nextTick(() => { $refs.nameInput.focus(); }); }
+                        }">
 
                         <div class="flex justify-between items-start" x-show="!isEditing">
                             <div>
@@ -48,7 +71,7 @@
                                 <span class="text-xs text-slate-500 font-medium">{{ $team->members->count() }} Members</span>
                             </div>
 
-                            <form action="{{ route('teams.destroy', $team->id) }}" method="POST" onsubmit="return confirm('Delete this team? All members will be unassigned.');">
+                            <form action="{{ route('teams.destroy', $team->id) }}" method="POST" onsubmit="confirmAction(event, 'Delete Team?', 'Are you sure you want to delete this team? All members will be unassigned.')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="text-slate-400 hover:text-red-500 p-1 rounded-md hover:bg-red-50 transition-colors" title="Delete Team">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -60,12 +83,12 @@
                             <form action="{{ route('teams.update', $team->id) }}" method="POST" class="flex items-center gap-2">
                                 @csrf @method('PUT')
                                 <input x-ref="nameInput"
-                                       type="text"
-                                       name="name"
-                                       value="{{ $team->name }}"
-                                       class="flex-1 px-2 py-1 text-sm border border-emerald-500 rounded focus:ring-2 focus:ring-emerald-200 outline-none"
-                                       required
-                                       @keydown.escape="isEditing = false">
+                                        type="text"
+                                        name="name"
+                                        value="{{ $team->name }}"
+                                        class="flex-1 px-2 py-1 text-sm border border-emerald-500 rounded focus:ring-2 focus:ring-emerald-200 outline-none"
+                                        required
+                                        @keydown.escape="isEditing = false">
 
                                 <button type="submit" class="text-white bg-emerald-600 hover:bg-emerald-700 p-1.5 rounded shadow-sm" title="Save">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
@@ -98,7 +121,7 @@
                                             </div>
                                         </div>
 
-                                        <form action="{{ route('teams.remove_member', $member->id) }}" method="POST" onsubmit="return confirm('Remove {{ $member->name }} from {{ $team->name }}?');">
+                                        <form action="{{ route('teams.remove_member', $member->id) }}" method="POST" onsubmit="confirmAction(event, 'Remove Member?', 'Are you sure you want to remove {{ addslashes($member->name) }} from {{ addslashes($team->name) }}?')">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1.5 hover:bg-red-50 rounded-md" title="Remove from team">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -138,4 +161,31 @@
             @endforelse
         </div>
     </div>
+
+    <script>
+        function confirmAction(event, title, text) {
+            event.preventDefault();
+            const form = event.target;
+            
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#94a3b8',
+                confirmButtonText: 'Yes, delete it',
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'rounded-lg px-4 py-2 font-medium shadow-sm',
+                    cancelButton: 'rounded-lg px-4 py-2 font-medium'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+    </script>
 @endsection
