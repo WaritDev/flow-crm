@@ -39,7 +39,9 @@ class PipelineStageController extends Controller
      */
     public function create()
     {
-        //
+        // Currently used by the Laravel UI, but not required by the SvelteKit Sales flow.
+        // If you need HTML create page, implement a Blade view + form fields.
+        return redirect()->route('pipeline-stages.index');
     }
 
     /**
@@ -47,7 +49,48 @@ class PipelineStageController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user = auth()->user();
+        $team = $user->team;
+
+        if (!$team && $user->organization) {
+            $team = $user->organization->teams()->first();
+        }
+
+        if (!$team || !$team->pipelineTemplate) {
+            abort(403, 'No pipeline template found for this team.');
+        }
+
+        // Sales in the Svelte flow also needs to be able to create stages.
+        if (!in_array($user->role, ['sales', 'manager'], true)) {
+            abort(403, 'Unauthorized.');
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'position' => 'nullable|integer|min:0',
+            'is_won' => 'nullable|boolean',
+            'description' => 'nullable|string',
+        ]);
+
+        $template = $team->pipelineTemplate;
+
+        $position = $request->input('position');
+        if ($position === null) {
+            $maxPos = $template->stages()->max('position');
+            $position = ($maxPos ?? -1) + 1;
+        }
+
+        $isWon = $request->boolean('is_won');
+
+        PipelineStage::create([
+            'template_id' => $template->id,
+            'name' => $request->input('name'),
+            'position' => $position,
+            'is_won' => $isWon,
+            'description' => $request->input('description'),
+        ]);
+
+        return redirect()->route('pipeline-stages.index')->with('success', 'สร้าง Stage เรียบร้อยแล้ว');
     }
 
     /**

@@ -60,9 +60,11 @@ class DealController extends Controller
             'customer_id' => 'required|exists:customers,id',
             'value' => 'required|numeric',
             'stage' => 'required',
-            'next_action' => 'required_unless:stage,lost,won',
-            'next_action_date' => 'required_unless:stage,lost,won',
+            'next_action' => 'nullable|string',
+            'next_action_date' => 'nullable|date',
+            'description' => 'nullable|string',
             'expected_close_date' => 'nullable|date',
+            'lost_reason' => 'nullable|string',
         ]);
 
         $stageId = $request->stage;
@@ -71,8 +73,11 @@ class DealController extends Controller
         $wonAt = null;
 
         // Handle 'Lost' State
-        // Handle 'Lost' State
         if ($request->stage === 'lost') {
+            $request->validate([
+                'lost_reason' => 'required|string',
+            ]);
+
             $lostReason = $request->lost_reason;
             $lostAt = now();
             // Fallback to the first stage ID for database constraint (since stage_id is foreign key)
@@ -97,6 +102,11 @@ class DealController extends Controller
             $stage = PipelineStage::find($request->stage);
             if ($stage && $stage->is_won) {
                 $wonAt = now();
+            } else {
+                $request->validate([
+                    'next_action' => 'required|string',
+                    'next_action_date' => 'required|date',
+                ]);
             }
         }
 
@@ -168,13 +178,25 @@ class DealController extends Controller
         Gate::authorize('update', $deal);
         $request->validate([
             'name' => 'required',
+            'customer_id' => 'required|exists:customers,id',
             'value' => 'required',
             'stage' => 'required',
+            'next_action' => 'nullable|string',
+            'next_action_date' => 'nullable|date',
+            'description' => 'nullable|string',
+            'expected_close_date' => 'nullable|date',
+            'lost_reason' => 'nullable|string',
         ]);
+
+        $customer = Customer::findOrFail($request->customer_id);
+        if ((string) $customer->team_id !== (string) Auth::user()->getTeamId()) {
+            return back()->withErrors(['customer_id' => 'ลูกค้านี้ไม่อยู่ในทีมของคุณ']);
+        }
 
         $stageId = $request->stage;
         $data = [
             'name' => $request->name,
+            'customer_id' => $request->customer_id,
             'value' => $request->value,
             'expected_close_date' => $request->expected_close_date,
             'description' => $request->description,
@@ -183,8 +205,27 @@ class DealController extends Controller
         ];
 
         if ($request->stage === 'lost') {
+            $request->validate([
+                'lost_reason' => 'required|string',
+            ]);
+
+            $resolvedStageId = null;
+            if (Auth::user()->team && Auth::user()->team->pipelineTemplate) {
+                $firstStage = Auth::user()->team->pipelineTemplate->stages->first();
+                $resolvedStageId = $firstStage ? $firstStage->id : null;
+            }
+            if (!$resolvedStageId) {
+                $fallbackStage = PipelineStage::first();
+                $resolvedStageId = $fallbackStage ? $fallbackStage->id : null;
+            }
+            if (!$resolvedStageId) {
+                return back()->withErrors(['stage' => 'No pipeline stages found in system. Please contact admin.']);
+            }
+
+            $data['stage_id'] = $resolvedStageId;
             $data['lost_reason'] = $request->lost_reason;
             $data['lost_at'] = $deal->lost_at ?? now();
+            $data['won_at'] = null;
         } else {
             $stage = PipelineStage::find($request->stage);
             $stageId = $request->stage;
@@ -194,6 +235,11 @@ class DealController extends Controller
 
             if ($stage && $stage->is_won) {
                 $data['won_at'] = now();
+            } else {
+                $request->validate([
+                    'next_action' => 'required|string',
+                    'next_action_date' => 'required|date',
+                ]);
             }
 
             $data['stage_id'] = $stageId;
@@ -208,6 +254,11 @@ class DealController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $deal = Deal::findOrFail($id);
+        Gate::authorize('delete', $deal);
+
+        $deal->delete();
+
+        return redirect()->route('pipeline-stages.index')->with('success', 'ลบดีลเรียบร้อยแล้ว');
     }
 }

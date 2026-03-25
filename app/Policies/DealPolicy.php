@@ -41,6 +41,12 @@ class DealPolicy
             return $user->organization_id === $deal->organization_id;
         }
 
+        // Sales pipeline is team-scoped: any sales on the same team may update deals on the board.
+        if ($user->role === 'sales') {
+            return $user->getTeamId() !== null
+                && (string) $user->getTeamId() === (string) $deal->team_id;
+        }
+
         return $user->id === $deal->user_id;
     }
 
@@ -49,7 +55,16 @@ class DealPolicy
      */
     public function delete(User $user, Deal $deal): bool
     {
-        return $user->role === 'manager' && $user->organization_id === $deal->organization_id;
+        if ($user->role === 'manager' && $user->organization_id === $deal->organization_id) {
+            return true;
+        }
+
+        if ($user->role === 'sales') {
+            return $user->getTeamId() !== null
+                && (string) $user->getTeamId() === (string) $deal->team_id;
+        }
+
+        return $user->id === $deal->user_id;
     }
 
     /**
