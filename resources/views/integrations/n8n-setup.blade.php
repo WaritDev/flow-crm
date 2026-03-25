@@ -80,10 +80,19 @@
                     <p class="text-sm text-slate-600 mb-3">
                         URL นี้ชี้ไปที่ n8n Webhook (บน managed n8n ของเรา) โดยใช้ path เฉพาะขององค์กรนี้
                     </p>
+                    @if(!$n8nBaseUrl)
+                        <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                            ยังไม่ได้ตั้งค่า <span class="font-mono font-semibold">N8N_URL</span> ใน <span class="font-mono">.env</span>
+                            เลยไม่สามารถสร้างลิงก์ Webhook URL แบบเต็มได้
+                            <div class="mt-2 text-xs text-amber-800">
+                                ตัวอย่าง: <span class="font-mono">N8N_URL=https://xxxx.ngrok-free.app</span>
+                            </div>
+                        </div>
+                    @endif
                     <div class="flex items-start gap-3">
-                        <textarea readonly class="w-full min-h-[70px] rounded-xl border border-slate-200 bg-slate-50 p-3 font-mono text-xs">{{ $webhookUrl }}</textarea>
+                        <textarea readonly class="w-full min-h-[70px] rounded-xl border border-slate-200 bg-slate-50 p-3 font-mono text-xs">{{ $webhookUrl ?: ('(ตั้งค่า N8N_URL ก่อน) Path: ' . ($integration->line_webhook_path ?? '')) }}</textarea>
                         <button type="button"
-                                onclick="navigator.clipboard.writeText(@json($webhookUrl));"
+                                onclick="navigator.clipboard.writeText(@json($webhookUrl ?: ($integration->line_webhook_path ?? '')));"
                                 class="shrink-0 rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-slate-800 transition">
                             Copy
                         </button>

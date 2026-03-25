@@ -19,8 +19,6 @@ class UserSeeder extends Seeder
 
         // Admin
         User::create([
-            'organization_id' => 1,
-            'team_id' => $team1->id,
             'name' => 'ผู้ดูแลระบบ',
             'email' => 'admin@flowcrm.com',
             'password' => bcrypt('password'),

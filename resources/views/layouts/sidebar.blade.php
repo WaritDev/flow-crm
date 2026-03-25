@@ -142,6 +142,20 @@
                 </span>
             </a>
 
+            <div class="pt-2 mt-2 border-t border-slate-800/50"></div>
+
+            <a href="{{ route('integrations.n8n.setup') }}"
+            class="group relative flex items-center gap-3 rounded-xl px-3 py-3 {{ request()->routeIs('integrations.n8n.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} transition-all duration-200">
+                <svg class="h-6 w-6 shrink-0 group-hover:text-amber-400 transition-colors" fill="none"
+                     stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M11.983 13.817l-.015.01a2.25 2.25 0 01-3.18-3.182l.01-.014m3.185 3.186l3.87 3.87a2.25 2.25 0 003.182-3.182l-3.87-3.87m-3.182 3.182l-.01.014a2.25 2.25 0 003.182 3.18l.014-.01M16.5 7.5l.344-.344a2.25 2.25 0 113.182 3.182l-.344.344M7.5 16.5l-.344.344a2.25 2.25 0 11-3.182-3.182l.344-.344" />
+                </svg>
+                <span x-show="!sidebarCollapsed" class="font-medium whitespace-nowrap transition-opacity duration-200">
+                    Settings
+                </span>
+            </a>
+
         @elseif(auth()->user()->isSales())
             <a href="{{ route('dashboard.index') }}"
             class="group relative flex items-center gap-3 rounded-xl px-3 py-3 {{ request()->routeIs('dashboard.index') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }} transition-all duration-200">

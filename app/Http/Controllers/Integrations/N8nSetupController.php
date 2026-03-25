@@ -71,7 +71,9 @@ class N8nSetupController extends Controller
         $n8nBaseUrl = (string) config('services.n8n.base_url', '');
         $webhookPrefix = (string) config('services.n8n.webhook_prefix', '/webhook/');
         $webhookPrefix = '/' . ltrim($webhookPrefix, '/');
-        $webhookUrl = rtrim($n8nBaseUrl, '/') . $webhookPrefix . ltrim($integration->line_webhook_path, '/');
+        $webhookUrl = $n8nBaseUrl !== ''
+            ? rtrim($n8nBaseUrl, '/') . $webhookPrefix . ltrim($integration->line_webhook_path, '/')
+            : '';
 
         $lineTokenPresent = $integration->line_channel_access_token_encrypted ? true : false;
 
@@ -80,6 +82,7 @@ class N8nSetupController extends Controller
             'integration' => $integration,
             'plainTextToken' => $plainTextToken,
             'webhookUrl' => $webhookUrl,
+            'n8nBaseUrl' => $n8nBaseUrl,
             'lineTokenPresent' => $lineTokenPresent,
         ]);
     }
