@@ -8,23 +8,38 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Activity extends Model
 {
     protected $fillable = [
-        'deal_id', 'customer_id', 'user_id', 'team_id',
-        'name', 'description', 'activity_type', 'priority', 'is_completed'
+        'deal_id',
+        'customer_id',
+        'user_id',
+        'team_id',
+        'name',
+        'description',
+        'activity_type',
+        'priority',
+        'is_completed'
     ];
 
     protected $casts = [
         'is_completed' => 'boolean',
     ];
 
-    public function deal(): BelongsTo {
+    public function deal(): BelongsTo
+    {
         return $this->belongsTo(Deal::class);
     }
 
-    public function customer(): BelongsTo {
+    public function customer(): BelongsTo
+    {
         return $this->belongsTo(Customer::class);
     }
 
-    public function organization(): BelongsTo {
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function organization(): BelongsTo
+    {
         return $this->belongsTo(Organization::class);
     }
 }

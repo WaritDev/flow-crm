@@ -67,7 +67,74 @@ class CustomerController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $user = Auth::user();
+        $teamId = $user->getTeamId();
+
+        $customer = Customer::with([
+            'deals' => function ($query) {
+                $query->orderBy('created_at', 'desc');
+            },
+            'deals.stage',
+            'activities' => function ($query) {
+                $query->orderBy('created_at', 'desc');
+            },
+            'activities.user'
+        ])
+            ->withSum(['deals as lifetime_value' => function ($query) {
+                $query->whereNotNull('won_at');
+            }], 'value')
+            ->withCount('deals as total_deals')
+            ->withMax('activities as last_contacted', 'created_at')
+            ->where('team_id', $teamId)
+            ->findOrFail($id);
+
+        return response()->json([
+            'customer' => [
+                'id' => $customer->id,
+                'name' => $customer->name,
+                'nickname' => $customer->nickname,
+                'phone_num' => $customer->phone_num,
+                'email' => $customer->email,
+                'line_id' => $customer->line_id,
+                'province' => $customer->province,
+                'address' => $customer->address,
+                'tags' => $customer->tags,
+                'status' => $customer->status,
+                'img_profile' => $customer->img_profile ? asset('storage/' . $customer->img_profile) : null,
+                'created_at' => $customer->created_at,
+                'updated_at' => $customer->updated_at,
+            ],
+            'statistics' => [
+                'lifetime_value' => (float) ($customer->lifetime_value ?? 0),
+                'total_deals' => $customer->total_deals,
+                'last_contacted' => $customer->last_contacted,
+            ],
+            'deals' => $customer->deals->map(function ($deal) {
+                return [
+                    'id' => $deal->id,
+                    'name' => $deal->name,
+                    'value' => $deal->value,
+                    'currency' => $deal->currency,
+                    'stage' => $deal->stage->name ?? 'Unknown',
+                    'is_won' => !is_null($deal->won_at),
+                    'is_lost' => !is_null($deal->lost_at),
+                    'expected_close_date' => $deal->expected_close_date,
+                    'created_at' => $deal->created_at,
+                ];
+            }),
+            'activities' => $customer->activities->map(function ($activity) {
+                return [
+                    'id' => $activity->id,
+                    'name' => $activity->name,
+                    'description' => $activity->description,
+                    'activity_type' => $activity->activity_type,
+                    'priority' => $activity->priority,
+                    'is_completed' => $activity->is_completed,
+                    'user_name' => $activity->user->name ?? 'Unknown',
+                    'created_at' => $activity->created_at,
+                ];
+            })
+        ]);
     }
 
     /**
