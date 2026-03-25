@@ -27,19 +27,19 @@ class N8nSetupController extends Controller
 
         $organization = Organization::findOrFail($orgId);
 
-        $integration = OrganizationIntegration::firstOrCreate(
-            ['organization_id' => $organization->id],
-            function () use ($organization) {
-                $secret = Str::random(40);
-                $path = 'flowcrm-line-' . $organization->id . '-' . $secret;
+        $integration = OrganizationIntegration::firstOrNew([
+            'organization_id' => $organization->id,
+        ]);
 
-                return [
-                    'line_webhook_secret' => $secret,
-                    'line_webhook_path' => $path,
-                    'n8n_token_name' => 'n8n-default',
-                ];
-            }
-        );
+        if (!$integration->exists) {
+            $secret = Str::random(40);
+            $path = 'flowcrm-line-' . $organization->id . '-' . $secret;
+
+            $integration->line_webhook_secret = $secret;
+            $integration->line_webhook_path = $path;
+            $integration->n8n_token_name = 'n8n-default';
+            $integration->save();
+        }
 
         // Ensure integration service user exists (token owner)
         $serviceUser = $integration->n8nServiceUser;
