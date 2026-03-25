@@ -73,7 +73,9 @@ class RegisteredUserController extends Controller
         });
 
         if ($request->role === 'manager' && isset($createdOrg)) {
-            return view('auth.register-success', ['organization' => $createdOrg]);
+            // Next step: integrations setup (generate n8n token + show LINE webhook)
+            $request->session()->put('flowcrm.n8n_generate_token', true);
+            return redirect()->route('integrations.n8n.setup');
         }
 
         return redirect(route('dashboard.index', absolute: false));

@@ -17,6 +17,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrganizationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\Integrations\N8nSetupController;
 
 Route::get('/', function () {
     return view('index');
@@ -80,6 +81,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/teams/members/{user}', [TeamController::class, 'removeMember'])->name('teams.remove_member');
         Route::post('/invitations', [InvitationController::class, 'store'])->name('invitations.store');
         Route::post('/dashboard/targets', [DashboardController::class, 'updateTargets'])->name('targets.update');
+
+        Route::get('/integrations/n8n/setup', [N8nSetupController::class, 'show'])->name('integrations.n8n.setup');
+        Route::post('/integrations/n8n/rotate-token', [N8nSetupController::class, 'rotateToken'])->name('integrations.n8n.rotate-token');
+        Route::post('/integrations/n8n/line-token', [N8nSetupController::class, 'upsertLineAccessToken'])->name('integrations.n8n.line-token');
     });
 
     Route::middleware(['role:admin'])->group(function () {

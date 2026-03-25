@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'n8n' => [
+        // Example (prod): https://n8n.flowcrm.app
+        // Example (local): http://localhost:5678
+        'base_url' => env('N8N_BASE_URL'),
+        // Default n8n webhook prefix: /webhook/<path>
+        'webhook_prefix' => env('N8N_WEBHOOK_PREFIX', '/webhook/'),
+    ],
+
 ];
