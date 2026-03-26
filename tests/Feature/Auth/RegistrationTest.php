@@ -32,6 +32,7 @@ test('manager can register and is redirected to integrations setup', function ()
         'org_description' => null,
     ]);
 
+    $response->assertSessionHasNoErrors();
     $this->assertAuthenticated();
     $user = auth()->user();
     expect($user->role)->toBe('manager');

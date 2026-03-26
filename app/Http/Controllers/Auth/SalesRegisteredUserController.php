@@ -33,7 +33,7 @@ class SalesRegisteredUserController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', 'regex:/^[\p{L}\p{M}]+(\s+[\p{L}\p{M}]+)+$/u'],
-            'email' => ['required', 'string', 'lowercase', 'email:rfc,dns', 'max:255', 'unique:'.User::class.',email'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class.',email'],
             'password' => ['required', 'confirmed', Password::defaults()],
             'invite_token' => ['required', 'string', 'max:64'],
         ], [
