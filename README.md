@@ -19,44 +19,58 @@ FlowCRM พัฒนาขึ้นโดยใช้เฟรมเวิร์
 
 ระบบถูกออกแบบมาให้รองรับการขยายตัวแบบ Multi-tenant SaaS และทำงานแบบ Event-Driven :
 
-* **Front-end:** React + Vite + Tailwind CSS เพื่อประสิทธิภาพการแสดงผลที่รวดเร็ว
-* **Back-end:** Laravel 11 (REST API) จัดการ Business Logic และการแยกข้อมูลรายร้านค้า (Data Isolation)
+* **Front-end (Sales):** SvelteKit + Vite + Tailwind (repo `flow-crm-frontend`)
+* **Back-end:** Laravel (API + Blade) จัดการ Business Logic และการแยกข้อมูลตามองค์กร
 * **Workflow Engine:** **n8n** ทำหน้าที่เป็นสมองกลคอยรับ Webhook จาก LINE OA และแปลงสัญญาณพฤติกรรมลูกค้าให้กลายเป็นกิจกรรมในระบบอัตโนมัติ 
 
 
-* **Data Layer:** PostgreSQL (ฐานข้อมูลหลัก)
-* **Services:** Docker สำหรับการจัดการสภาพแวดล้อม และ Mailpit สำหรับทดสอบระบบอีเมล
+* **Data Layer:** MySQL (ผ่าน Laravel Sail ในโหมดพัฒนา)
+* **Services:** Docker (Sail) — MySQL, Redis, Mailpit
 
-## Getting Started (ขั้นตอนการติดตั้ง)
+---
 
-### 1. Prerequisites
+## Quick Start — รัน Backend (Laravel Sail)
 
-* ติดตั้ง([https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/))
-* (สำหรับ Windows) แนะนำให้รันผ่าน WSL2
+1. **โคลน repo**
+   ```bash
+   git clone <url-ของ-repo-นี้>.git
+   cd flow-crm-backend
+   ```
+2. **ตั้งค่า `.env`**
+   ```bash
+   cp .env.example .env
+   ```
+3. **ติดตั้ง dependency PHP (Composer)**
+   ```bash
+   docker run --rm \
+     -u "$(id -u):$(id -g)" \
+     -v "$(pwd):/app" \
+     -w /app \
+     composer:latest \
+     composer install --ignore-platform-reqs
+   ```
+   *หรือรัน `composer install` ในโฟลเดอร์โปรเจกต์ถ้ามี PHP/ Composer บนเครื่องแล้ว*
+4. **ขึ้น container (MySQL, Redis, Mailpit, app)**
+   ```bash
+   ./vendor/bin/sail up -d
+   ```
+5. **สร้าง key และฐานข้อมูล + seed ตัวอย่าง**
+   ```bash
+   ./vendor/bin/sail artisan key:generate
+   ./vendor/bin/sail artisan migrate --seed
+   ```
+6. **เปิดเว็บ** — โดยค่าเริ่มต้น `http://localhost` (พอร์ต 80 ตาม `APP_PORT` ใน `.env`)
 
-### 2. Installation
+### ค่า `.env` ที่ควรตรงกับ Sail (MySQL)
 
-ทำการ Clone โปรเจกต์และเตรียมสภาพแวดล้อมดังนี้:
-
-```bash
-# Clone Github project
-git clone https://github.com/WaritDev/flow-crm.git
-cd flow-crm
-
-# สร้างไฟล์.env จากตัวอย่าง
-cp.env.example.env
-
-```
-
-**แก้ไขไฟล์ `.env**` กำหนดค่าพื้นฐานสำหรับการพัฒนา (Development):
+ถ้าใช้ `compose.yaml` ของ Sail ให้กำหนดประมาณนี้ (ดูรายละเอียดเต็มใน `.env.example`):
 
 ```env
-PHP_CLI_SERVER_WORKERS=4
-LOG_CHANNEL=daily
+APP_URL=http://localhost
 DB_CONNECTION=mysql
 DB_HOST=mysql
 DB_PORT=3306
-DB_DATABASE=lab_laravel
+DB_DATABASE=laravel
 DB_USERNAME=sail
 DB_PASSWORD=password
 
@@ -64,50 +78,24 @@ MAIL_MAILER=smtp
 MAIL_HOST=mailpit
 MAIL_PORT=1025
 
-# Mailpit รับ SMTP แค่ในคอนเทนเนอร์ — อีเมลไม่ออกอินเทอร์เน็ต เปิดดูที่ UI โฮสต์ (พอร์ต 8025 ตาม compose.yaml)
-# /register = ผู้จัดการเท่านั้น · Sales สมัครผ่านแอป (POST /register/sales) ด้วยรหัสเชิญองค์กร
-
 REDIS_HOST=redis
-
 ```
 
-### 3. Install Dependencies & Start Services
+- **Mailpit UI:** `http://localhost:8025` (ตาม `FORWARD_MAILPIT_DASHBOARD_PORT`)
+- **ผู้จัดการลงทะเบียน:** `http://localhost/register`  
+- **Sales สมัคร:** ผ่านแอป frontend `/register` ด้วยรหัสเชิญองค์กร
 
-ติดตั้งคอมโพเนนต์ที่จำเป็นและรันตู้คอนเทนเนอร์:
+รันคำสั่ง artisan ซ้ำๆ: `./vendor/bin/sail artisan ...`  
+หยุด: `./vendor/bin/sail down`
 
-```bash
-# ติดตั้ง PHP Dependencies (Composer) ผ่าน Docker
-docker run --rm \
-    -u "$(id -u):$(id -g)" \
-    -v "$(pwd):/app" \
-    -w /app \
-    composer:latest \
-    install --ignore-platform-reqs
+### Prerequisites
 
-# รัน Services ทั้งหมดด้วย Laravel Sail
-./vendor/bin/sail up -d
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (แนะนำ WSL2 บน Windows)
 
-# รัน Dev Server
-./vendor/bin/sail sail yarn dev
-
-```
-
-### 4. Application Initialization
-
-ตั้งค่ากุญแจความปลอดภัยและเตรียมฐานข้อมูลพร้อมข้อมูลตัวอย่าง (Seeder):
-
-```bash
-# สร้าง APP_KEY
-./vendor/bin/sail artisan key:generate
-
-# Migration พร้อม Seed ข้อมูลตัวอย่าง (Manager, sales, Templates, Deals)
-./vendor/bin/sail artisan migrate:refresh --seed
-
-```
 
 ## Access Information (ข้อมูลการเข้าใช้งาน)
 
-เมื่อรันระบบเสร็จสิ้น สามารถเข้าใช้งานได้ที่: `http://localhost`
+เมื่อรันระบบเสร็จสิ้น สามารถเข้าใช้งานได้ที่: `http://localhost` สำหรับ Role Manager และ Admin
 
 **บัญชีสำหรับทดสอบ (Default Credentials):**
 
@@ -116,6 +104,8 @@ docker run --rm \
 * **Manager-Org2:** `manager@org2.com` / `password`
 * **Sales:** `sales1@org1.com` / `password`
 * **Sales:** `sales1@org2.com` / `password`
+
+แอป Sales (SvelteKit) และ workflow **n8n** — ดู `flow-crm-frontend/README.md` และ `flow-crm-n8n/README.md`
 
 ## Key Features for Demo
 
