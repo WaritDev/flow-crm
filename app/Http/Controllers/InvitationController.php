@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Invitation;
 use App\Mail\TeamInvitationMail;
+use App\Models\Invitation;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class InvitationController extends Controller
 {
@@ -22,16 +23,18 @@ class InvitationController extends Controller
 
         $request->validate([
             'email' => [
-                'required', 
-                'email', 
-                'unique:users,email'
+                'required',
+                'email',
+                'unique:users,email',
             ],
             'team_id' => [
-                'nullable', 
+                'nullable',
                 Rule::exists('teams', 'id')->where(function ($query) use ($currentUser) {
                     return $query->where('organization_id', $currentUser->organization_id);
-                })
-            ]
+                }),
+            ],
+        ], [
+            'email.unique' => 'This person already has a FlowCRM account. They can log in with this email.',
         ]);
 
         $token = Str::random(32);
@@ -42,12 +45,13 @@ class InvitationController extends Controller
                 'organization_id' => $currentUser->organization_id,
                 'team_id' => $request->team_id,
                 'role' => 'sales',
-                'expires_at' => Carbon::now()->addDays(7)
+                'expires_at' => Carbon::now()->addDays(7),
             ]
         );
 
         Mail::to($request->email)->send(new TeamInvitationMail($invitation, $currentUser->name));
-        return back()->with('success', 'Invitation sent successfully to ' . $request->email);
+
+        return back()->with('success', 'Invitation sent successfully to '.$request->email);
     }
 
     public function accept(Request $request)
@@ -59,8 +63,14 @@ class InvitationController extends Controller
         ]);
 
         $invitation = Invitation::where('token', $request->token)
-                        ->where('expires_at', '>', now())
-                        ->firstOrFail();
+            ->where('expires_at', '>', now())
+            ->firstOrFail();
+
+        if (User::query()->where('email', $invitation->email)->exists()) {
+            throw ValidationException::withMessages([
+                'email' => ['This email is already registered. Please log in instead.'],
+            ]);
+        }
 
         $user = User::create([
             'name' => $request->name,
@@ -74,6 +84,7 @@ class InvitationController extends Controller
 
         $invitation->delete();
         Auth::login($user);
+
         return redirect()->route('dashboard.index')->with('success', 'Account created! Welcome to the team.');
     }
 }

@@ -35,7 +35,11 @@
         style="margin-left: var(--sidebar-width);">
 
     <div class="p-6 md:p-8">
-        @yield('content')
+        @if (isset($slot))
+            {{ $slot }}
+        @else
+            @yield('content')
+        @endif
     </div>
 
 </main>

@@ -15,6 +15,9 @@
                     <label class="block font-medium text-sm text-slate-700">Email</label>
                     <input type="email" name="email" value="{{ $invitation->email }}" readonly 
                         class="mt-1 block w-full bg-slate-100 border-slate-300 rounded-md shadow-sm text-slate-500 cursor-not-allowed">
+                    @error('email')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
     
                 <div class="mb-4">

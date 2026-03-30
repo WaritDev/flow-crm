@@ -2,12 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Customer;
 use App\Models\Deal;
 use App\Models\Team;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class DealSeeder extends Seeder
 {
@@ -42,6 +41,7 @@ class DealSeeder extends Seeder
 
             $nextActionsByStage = [
                 'สนใจ' => 'ทักเพื่อขอข้อมูลเพิ่มเติมทาง LINE',
+                'คัดกรอง' => 'คัดกรองความต้องการและผู้ตัดสินใจ',
                 'ติดต่อแล้ว' => 'นัดหมายเพื่อคุยรายละเอียดให้ชัดเจน',
                 'เสนอราคา' => 'ส่งใบเสนอราคาและถามความคืบหน้าผ่าน LINE',
                 'เจรจา' => 'ต่อรองราคา/เงื่อนไขและขอเอกสารเพิ่มเติม',
@@ -71,7 +71,7 @@ class DealSeeder extends Seeder
 
             Deal::create([
                 'organization_id' => $customer->organization_id,
-                'name' => 'ดีลสำหรับ ' . $customer->name,
+                'name' => 'ดีลสำหรับ '.$customer->name,
                 'customer_id' => $customer->id,
                 'user_id' => $customer->user_id,
                 'team_id' => $customer->team_id,
