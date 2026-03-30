@@ -59,5 +59,91 @@
                 </div>
             </form>
         </div>
+
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="text-lg font-bold text-slate-800">Integrations (Admin)</h3>
+            <p class="text-sm text-slate-500 mt-1">
+                ตั้งค่า n8n token และ LINE OA webhook ขององค์กรนี้
+            </p>
+
+            @if(session('n8n_plain_text_token'))
+                <div class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                    <p class="text-sm font-semibold text-emerald-800">n8n token ใหม่ (แสดงครั้งเดียว)</p>
+                    <div class="mt-2 flex items-start gap-3">
+                        <textarea readonly class="w-full min-h-[80px] rounded-xl border border-emerald-200 bg-white p-3 font-mono text-xs">{{ session('n8n_plain_text_token') }}</textarea>
+                        <button type="button"
+                                onclick="navigator.clipboard.writeText(@json(session('n8n_plain_text_token')));"
+                                class="shrink-0 rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-slate-800 transition">
+                            Copy
+                        </button>
+                    </div>
+                </div>
+            @endif
+
+            <form action="{{ route('organizations.update', $organization->id) }}" method="POST" class="mt-5 space-y-5">
+                @csrf
+                @method('PUT')
+
+                <input type="hidden" name="name" value="{{ old('name', $organization->name) }}">
+                <input type="hidden" name="slug" value="{{ old('slug', $organization->slug) }}">
+                <input type="hidden" name="size" value="{{ old('size', $organization->size) }}">
+                <input type="hidden" name="description" value="{{ old('description', $organization->description) }}">
+                <input type="hidden" name="invite_code" value="{{ old('invite_code', $organization->invite_code) }}">
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">n8n Token Name</label>
+                    <input type="text" name="integration_n8n_token_name" value="{{ old('integration_n8n_token_name', $integration->n8n_token_name ?? '') }}"
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                           placeholder="n8n-default">
+                    @error('integration_n8n_token_name') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">LINE OA Webhook Path</label>
+                    <input type="text" name="integration_line_webhook_path" value="{{ old('integration_line_webhook_path', $integration->line_webhook_path ?? '') }}"
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                           placeholder="flowcrm-line-<org>-<secret>">
+                    @error('integration_line_webhook_path') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                    <p class="text-xs text-slate-500 mt-2">
+                        @if($n8nBaseUrl)
+                            Webhook URL: <span class="font-mono select-all">{{ $webhookUrl }}</span>
+                        @else
+                            ตั้งค่า <span class="font-mono">N8N_URL</span> ใน <span class="font-mono">.env</span> เพื่อให้ระบบสร้างลิงก์เต็ม (รองรับ https/ngrok)
+                        @endif
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <input id="integration_regenerate_line_webhook" type="checkbox" name="integration_regenerate_line_webhook" value="1"
+                           class="rounded border-slate-300 text-amber-600 focus:ring-amber-500">
+                    <label for="integration_regenerate_line_webhook" class="text-sm text-slate-700">
+                        Regenerate LINE webhook secret/path
+                    </label>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">LINE OA Channel Access Token (Optional)</label>
+                    <textarea name="integration_line_channel_access_token" rows="3"
+                              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                              placeholder="เว้นว่างไว้ได้ (ถ้าให้ n8n เป็นคนส่งข้อความเอง)"></textarea>
+                    @error('integration_line_channel_access_token') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                    <p class="text-xs text-slate-500 mt-2">สถานะ: {{ ($integration->line_channel_access_token_encrypted ?? null) ? 'ตั้งค่าแล้ว' : 'ยังไม่ตั้งค่า' }}</p>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <input id="integration_rotate_n8n_token" type="checkbox" name="integration_rotate_n8n_token" value="1"
+                           class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+                    <label for="integration_rotate_n8n_token" class="text-sm text-slate-700">
+                        Rotate n8n token (สร้างใหม่และยกเลิกของเดิม)
+                    </label>
+                </div>
+
+                <div class="pt-2 flex justify-end">
+                    <button type="submit" class="bg-slate-900 text-white px-6 py-2.5 rounded-lg hover:bg-slate-800 font-medium shadow-sm transition-all">
+                        Save Integrations
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 @endsection

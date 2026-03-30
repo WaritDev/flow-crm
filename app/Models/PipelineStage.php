@@ -17,4 +17,8 @@ class PipelineStage extends Model
     public function lineScripts(): HasMany {
         return $this->hasMany(LineScript::class, 'stage_id');
     }
+
+    public function deals(): HasMany {
+        return $this->hasMany(Deal::class, 'stage_id');
+    }
 }

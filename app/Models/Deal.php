@@ -24,7 +24,15 @@ class Deal extends Model
 
     public function isStale(): bool
     {
-        return $this->next_action_date < now() &&!$this->won_at &&!$this->lost_at;
+        if ($this->won_at || $this->lost_at) {
+            return false;
+        }
+
+        if ($this->next_action_date === null) {
+            return true;
+        }
+
+        return $this->next_action_date->toDateString() < now()->toDateString();
     }
 
     public function customer(): BelongsTo {
@@ -41,5 +49,13 @@ class Deal extends Model
 
     public function organization(): BelongsTo {
         return $this->belongsTo(Organization::class);
+    }
+
+    public function deals(): HasMany {
+        return $this->hasMany(Deal::class, 'stage_id');
+    }
+
+    public function user(): BelongsTo {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

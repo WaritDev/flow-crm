@@ -55,6 +55,11 @@ return [
     'url' => env('APP_URL', 'http://localhost'),
 
     /*
+    | SvelteKit / public marketing URL — optional link from auth pages (e.g. sales register).
+    */
+    'frontend_url' => env('FRONTEND_URL') ?: env('SALES_APP_URL'),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------

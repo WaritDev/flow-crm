@@ -2,140 +2,204 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PipelineTemplate;
+use App\Models\Team;
+use App\Services\PipelineTemplateManagementService;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class PipelineTemplateController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        // จำลองข้อมูล Template ตามรูปภาพ
-        $templates = [
-            [
-                'id' => 'beauty_clinic',
-                'icon' => 'sparkles', // ชื่อ icon
-                'color' => 'pink', // theme สี
-                'is_popular' => true,
-                'title_th' => 'ธุรกิจคลินิกความงาม',
-                'title_en' => 'Beauty Clinic',
-                'description' => 'สำหรับคลินิกเสริมความงาม, สปา, นวดหน้า, ทำเล็บ พร้อม Script ทักลูกค้า',
-                'stages' => ['สอบถาม', 'นัดคิว', 'ยืนยัน', 'ชำระเงิน', 'เสร็จสิ้น'],
-                'script_count' => 12
-            ],
-            [
-                'id' => 'construction',
-                'icon' => 'wrench',
-                'color' => 'orange',
-                'is_popular' => false,
-                'title_th' => 'ธุรกิจรับเหมาก่อสร้าง',
-                'title_en' => 'Contractor / Construction',
-                'description' => 'สำหรับงานรับเหมา, ตกแต่งภายใน, งานซ่อมบำรุง จัดการโปรเจกต์ใหญ่',
-                'stages' => ['สำรวจหน้างาน', 'ส่งใบเสนอราคา', 'เจรจา', 'เซ็นสัญญา', 'ดำเนินการ', 'ส่งมอบ'],
-                'script_count' => 8
-            ],
-            [
-                'id' => 'preorder',
-                'icon' => 'shopping-bag',
-                'color' => 'purple',
-                'is_popular' => true,
-                'title_th' => 'ร้านพรีออเดอร์',
-                'title_en' => 'Pre-order Shop',
-                'description' => 'สำหรับร้านค้าพรีออเดอร์, ขายสินค้านำเข้า, รับจองสินค้าล่วงหน้า',
-                'stages' => ['รับออเดอร์', 'ชำระเงิน', 'รอสินค้า', 'สินค้ามาถึง', 'จัดส่ง'],
-                'script_count' => 10
-            ],
-            [
-                'id' => 'service',
-                'icon' => 'office-building',
-                'color' => 'blue',
-                'is_popular' => false,
-                'title_th' => 'ธุรกิจบริการ',
-                'title_en' => 'Service-based Business',
-                'description' => 'สำหรับธุรกิจให้บริการทั่วไป เช่น ซ่อมรถ, ซ่อมแอร์, งานช่าง',
-                'stages' => ['สอบถาม', 'นัดหมาย', 'ดำเนินการ', 'ชำระเงิน'],
-                'script_count' => 6
-            ],
-            [
-                'id' => 'b2b',
-                'icon' => 'briefcase',
-                'color' => 'indigo',
-                'is_popular' => false,
-                'title_th' => 'ธุรกิจ B2B sales',
-                'title_en' => 'B2B sales',
-                'description' => 'สำหรับขายองค์กร, ขายส่ง, ดีลขนาดใหญ่ที่ต้องติดตามหลายขั้นตอน',
-                'stages' => ['Lead', 'ติดต่อ', 'นำเสนอ', 'Proposal', 'เจรจา', 'ปิดการขาย'],
-                'script_count' => 15
-            ],
-            [
-                'id' => 'healthcare',
-                'icon' => 'heart',
-                'color' => 'rose',
-                'is_popular' => false,
-                'title_th' => 'ธุรกิจสุขภาพ',
-                'title_en' => 'Healthcare',
-                'description' => 'สำหรับคลินิก, ฟิตเนส, โยคะ, นักโภชนาการ, โค้ชส่วนตัว',
-                'stages' => ['สอบถาม', 'นัดปรึกษา', 'เสนอแพ็กเกจ', 'ลงทะเบียน'],
-                'script_count' => 9
-            ],
-        ];
+    public function __construct(
+        private PipelineTemplateManagementService $templates,
+    ) {}
 
-        return view('pipeline-templates.index', compact('templates'));
+    public function index(Request $request): View
+    {
+        $user = $request->user();
+        abort_unless($user->isManager() && $user->organization_id, 403);
+
+        $orgId = (int) $user->organization_id;
+        $dbTemplates = $this->templates->listForOrganization($orgId);
+        $teams = Team::query()
+            ->where('organization_id', $orgId)
+            ->with('pipelineTemplate:id,name,organization_id')
+            ->withCount('deals')
+            ->orderBy('name')
+            ->get();
+
+        return view('pipeline-templates.index', [
+            'templates' => $dbTemplates,
+            'teams' => $teams,
+        ]);
     }
 
     public function select(Request $request)
     {
-        // Logic สำหรับบันทึก Template ที่เลือกเข้าสู่ Team
-        // $team->pipelines()->create(...)
-        return redirect()->route('pipeline-stages.index')->with('success', 'ติดตั้ง Pipeline เรียบร้อยแล้ว');
+        $user = $request->user();
+        abort_unless($user->isManager() && $user->organization_id, 403);
+
+        $validated = $request->validate([
+            'team_id' => ['required', 'integer', 'exists:teams,id'],
+            'template_id' => ['required', 'integer', 'exists:pipeline_templates,id'],
+        ]);
+
+        $team = Team::findOrFail($validated['team_id']);
+        $template = PipelineTemplate::findOrFail($validated['template_id']);
+
+        $this->templates->assignTemplateToTeam($user, $team, $template);
+
+        return redirect()
+            ->route('pipeline-templates.index')
+            ->with('success', 'กำหนด Pipeline template ให้ทีม «'.$team->name.'» แล้ว');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(): View
     {
-        //
+        $user = auth()->user();
+        abort_unless($user->isManager() && $user->organization_id, 403);
+
+        return view('pipeline-templates.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $user = $request->user();
+        abort_unless($user->isManager() && $user->organization_id, 403);
+
+        $rawStages = array_values(array_filter(
+            $request->input('stages', []),
+            fn ($r) => is_array($r) && isset($r['name']) && trim((string) $r['name']) !== ''
+        ));
+        $request->merge(['stages' => $rawStages]);
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'industry' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:5000'],
+            'stages' => ['required', 'array', 'min:1'],
+            'stages.*.name' => ['required', 'string', 'max:255'],
+            'stages.*.is_won' => ['nullable', 'boolean'],
+        ]);
+
+        $stages = [];
+        foreach ($validated['stages'] as $i => $row) {
+            $stages[] = [
+                'name' => $row['name'],
+                'position' => $i + 1,
+                'is_won' => ! empty($row['is_won']),
+            ];
+        }
+
+        $this->templates->createCustomTemplate(
+            $user,
+            $validated['name'],
+            $validated['industry'] ?? null,
+            $validated['description'] ?? null,
+            $stages,
+        );
+
+        return redirect()
+            ->route('pipeline-templates.index')
+            ->with('success', 'สร้าง Pipeline template ขององค์กรแล้ว');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Request $request, PipelineTemplate $pipeline_template): View
     {
-        //
+        $user = $request->user();
+        abort_unless($user->isManager() && $user->organization_id, 403);
+        abort_unless(
+            $this->templates->templateVisibleToOrganization($pipeline_template, (int) $user->organization_id),
+            404
+        );
+
+        $pipeline_template->load(['stages' => fn ($q) => $q->orderBy('position')]);
+        $teamsUsing = Team::query()
+            ->where('template_id', $pipeline_template->id)
+            ->where('organization_id', $user->organization_id)
+            ->withCount('deals')
+            ->get();
+
+        return view('pipeline-templates.show', [
+            'template' => $pipeline_template,
+            'teamsUsing' => $teamsUsing,
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(Request $request, PipelineTemplate $pipeline_template): View
     {
-        //
+        $user = $request->user();
+        abort_unless($user->isManager() && $user->organization_id, 403);
+
+        if ($pipeline_template->isSystemTemplate()) {
+            abort(403, 'แก้ไขเทมเพลตระบบจากที่นี่ไม่ได้');
+        }
+        if ((int) $pipeline_template->organization_id !== (int) $user->organization_id) {
+            abort(403);
+        }
+
+        $pipeline_template->load(['stages' => fn ($q) => $q->orderBy('position')]);
+        $teamsAssigned = Team::query()
+            ->where('template_id', $pipeline_template->id)
+            ->where('organization_id', $user->organization_id)
+            ->exists();
+
+        return view('pipeline-templates.edit', [
+            'template' => $pipeline_template,
+            'teamsAssigned' => $teamsAssigned,
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, PipelineTemplate $pipeline_template)
     {
-        //
+        $user = $request->user();
+        abort_unless($user->isManager() && $user->organization_id, 403);
+
+        if ($request->has('stages')) {
+            $rawStages = array_values(array_filter(
+                $request->input('stages', []),
+                fn ($r) => is_array($r) && isset($r['name']) && trim((string) $r['name']) !== ''
+            ));
+            $request->merge(['stages' => $rawStages]);
+        }
+
+        $validated = $request->validate([
+            'name' => ['sometimes', 'string', 'max:255'],
+            'industry' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:5000'],
+            'stages' => ['sometimes', 'array', 'min:1'],
+            'stages.*.name' => ['required_with:stages', 'string', 'max:255'],
+            'stages.*.is_won' => ['nullable', 'boolean'],
+        ]);
+
+        if (isset($validated['stages'])) {
+            $payloadStages = [];
+            foreach ($validated['stages'] as $i => $row) {
+                $payloadStages[] = [
+                    'name' => $row['name'],
+                    'position' => $i + 1,
+                    'is_won' => ! empty($row['is_won']),
+                ];
+            }
+            $validated['stages'] = $payloadStages;
+        }
+
+        $this->templates->updateTemplate($user, $pipeline_template, $validated);
+
+        return redirect()
+            ->route('pipeline-templates.index')
+            ->with('success', 'บันทึกการแก้ไข template แล้ว');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Request $request, PipelineTemplate $pipeline_template)
     {
-        //
+        $user = $request->user();
+        abort_unless($user->isManager() && $user->organization_id, 403);
+
+        $this->templates->deleteTemplate($user, $pipeline_template);
+
+        return redirect()
+            ->route('pipeline-templates.index')
+            ->with('success', 'ลบ template แล้ว');
     }
 }

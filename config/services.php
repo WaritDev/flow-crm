@@ -35,4 +35,24 @@ return [
         ],
     ],
 
+    'n8n' => [
+        // Example (prod): https://n8n.flowcrm.app
+        // Example (local): http://localhost:5678
+        // Prefer N8N_URL (ngrok/https), fallback to N8N_BASE_URL
+        'base_url' => env('N8N_URL', env('N8N_BASE_URL')),
+        // Default n8n webhook prefix: /webhook/<path>
+        'webhook_prefix' => env('N8N_WEBHOOK_PREFIX', '/webhook/'),
+        // Outbound: Laravel → n8n when a deal stage changes (Workflow 2 “Automated follow-up”).
+        // e.g. https://n8n.example/webhook/deal-stage-moved
+        'followup_webhook_url' => env('N8N_FOLLOWUP_WEBHOOK_URL'),
+    ],
+
+    /*
+    | LINE inbound (n8n → Laravel): transcript rows stored in Redis lists keyed by org + LINE userId.
+    | Independent from n8n "Redis Chat Memory" key format; use the same LINE userId in both for consistency.
+    */
+    'line_inbound' => [
+        'conversation_ttl_seconds' => (int) env('LINE_INBOUND_CONVERSATION_TTL', 60 * 60 * 24 * 30),
+    ],
+
 ];

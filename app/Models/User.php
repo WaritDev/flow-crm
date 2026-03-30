@@ -8,18 +8,21 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use App\Models\Target;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
-    protected $fillable = ['name', 'username', 'email', 'password', 'role', 'img_url', 'team_id', 'last_login', 'organization_id'];
+    protected $fillable = ['name', 'username', 'email', 'password', 'role', 'img_url', 'team_id', 'last_login', 'organization_id', 'is_active'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -73,5 +76,19 @@ class User extends Authenticatable
 
     public function getOrganizationId(): ?string {
         return $this->organization_id;
+    }
+
+    public function targets(): MorphMany
+    {
+        return $this->morphMany(Target::class, 'targetable');
+    }
+
+    public function currentMonthTarget($type = 'revenue')
+    {
+        return $this->targets()
+            ->where('month', now()->month)
+            ->where('year', now()->year)
+            ->where('type', $type)
+            ->first();
     }
 }

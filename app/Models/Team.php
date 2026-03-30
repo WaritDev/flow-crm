@@ -24,4 +24,14 @@ class Team extends Model
     public function organization(): BelongsTo {
         return $this->belongsTo(Organization::class);
     }
+
+    public function deals(): HasMany
+    {
+        return $this->hasMany(Deal::class, 'team_id');
+    }
+
+    public function mayChangePipelineTemplate(): bool
+    {
+        return ! $this->deals()->exists();
+    }
 }
