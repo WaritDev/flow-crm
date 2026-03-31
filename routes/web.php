@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Sales\SalesCsrfController;
 use App\Http\Controllers\Api\Sales\SalesCustomersController as SalesCustomersApiController;
 use App\Http\Controllers\Api\Sales\SalesDealsController;
 use App\Http\Controllers\Api\Sales\SalesPipelineBoardController;
+use App\Http\Controllers\Api\Sales\SalesProfileController;
 use App\Http\Controllers\Api\Sales\SalesPipelineTemplatesController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
@@ -37,6 +38,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/api/sales/customers', [SalesCustomersApiController::class, 'store']);
     Route::get('/api/sales/customers/{customer}', [SalesCustomersApiController::class, 'show']);
     Route::put('/api/sales/customers/{customer}', [SalesCustomersApiController::class, 'update']);
+
+    Route::patch('/api/sales/profile', [SalesProfileController::class, 'update']);
+    Route::put('/api/sales/profile/password', [SalesProfileController::class, 'updatePassword']);
+    Route::delete('/api/sales/profile', [SalesProfileController::class, 'destroy']);
 
     Route::get('/api/sales/pipeline-templates', [SalesPipelineTemplatesController::class, 'index']);
     Route::get('/api/sales/pipeline-templates/teams', [SalesPipelineTemplatesController::class, 'teams']);

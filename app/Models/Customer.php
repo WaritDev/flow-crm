@@ -22,7 +22,8 @@ class Customer extends Model
         'province',
         'address',
         'status',
-        'img_profile'
+        'img_profile',
+        'tags',
     ];
 
     public function user(): BelongsTo

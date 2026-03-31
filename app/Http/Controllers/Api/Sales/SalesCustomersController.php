@@ -11,6 +11,20 @@ use Illuminate\Support\Facades\Storage;
 
 class SalesCustomersController extends Controller
 {
+    private function resolveAvatarUrl(?string $img): ?string
+    {
+        if (! $img) {
+            return null;
+        }
+
+        $img = trim($img);
+        if (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) {
+            return $img;
+        }
+
+        return Storage::disk('public')->url($img);
+    }
+
     public function index(Request $request)
     {
         $user = $request->user();
@@ -73,6 +87,7 @@ class SalesCustomersController extends Controller
                 'is_active' => $c->status === 'active',
                 'lifetime_value' => (float) $lifetimeValue,
                 'organization_name' => $c->organization?->name,
+                'avatar_url' => $this->resolveAvatarUrl($c->img_profile),
             ];
         });
 
@@ -161,7 +176,7 @@ class SalesCustomersController extends Controller
         }
 
         $customer->load(['organization']);
-        $avatarUrl = $customer->img_profile ? Storage::disk('public')->url($customer->img_profile) : null;
+        $avatarUrl = $this->resolveAvatarUrl($customer->img_profile);
 
         $deals = Deal::where('customer_id', $customer->id)
             ->where('team_id', $customer->team_id);
@@ -324,7 +339,7 @@ class SalesCustomersController extends Controller
         $customer->status = $request->boolean('is_active') ? 'active' : 'inactive';
 
         if ($request->hasFile('avatar')) {
-            if ($customer->img_profile) {
+            if ($customer->img_profile && ! str_starts_with($customer->img_profile, 'http://') && ! str_starts_with($customer->img_profile, 'https://')) {
                 Storage::disk('public')->delete($customer->img_profile);
             }
             $path = $request->file('avatar')->store('customers', 'public');

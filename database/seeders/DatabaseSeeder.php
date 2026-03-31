@@ -25,5 +25,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ManagerDashboardSeeder::class);
         $this->call(DemoFlowSeeder::class);
         $this->call(MonitoringInactiveDemoSeeder::class);
+        $this->call(OneMonthOrganizationDemoSeeder::class);
     }
 }
