@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Sales;
 
+use App\Events\ActivityStreamUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use Illuminate\Http\Request;
@@ -60,33 +61,33 @@ class SalesActivitiesController extends Controller
                 };
 
                 $priorityLabel = match ($priorityKey) {
-                    'urgent' => 'ด่วน',
-                    'medium' => 'ปานกลาง',
-                    default => 'ปกติ',
+                    'urgent' => 'Urgent',
+                    'medium' => 'Medium',
+                    default => 'Normal',
                 };
 
                 $actionType = match ($a->activity_type) {
-                    'call' => 'โทร',
-                    'message' => 'ข้อความ',
-                    'line' => 'ทัก LINE',
-                    'meeting' => 'ประชุม',
-                    'email' => 'อีเมล',
-                    'note' => 'โน้ต',
-                    'task' => 'งานต่อไป',
+                    'call' => 'Call',
+                    'message' => 'Message',
+                    'line' => 'LINE',
+                    'meeting' => 'Meeting',
+                    'email' => 'Email',
+                    'note' => 'Note',
+                    'task' => 'Next action',
                     default => 'Task',
                 };
 
                 $customerNickname = (string) ($customer?->nickname ?? '');
                 $customerName = (string) ($customer?->name ?? '');
 
-                $warning = $isOverdue ? 'เลยกำหนดแล้ว' : '';
+                $warning = $isOverdue ? 'Overdue' : '';
 
                 if (!$dueDate) {
                     $timeLabel = '-';
                 } elseif ($isOverdue) {
-                    $timeLabel = 'เลยกำหนด';
+                    $timeLabel = 'Overdue';
                 } elseif ($isToday) {
-                    $timeLabel = 'วันนี้';
+                    $timeLabel = 'Today';
                 } else {
                     $timeLabel = $dueDate->format('d M');
                 }
@@ -163,6 +164,7 @@ class SalesActivitiesController extends Controller
         }
 
         $activity->update(['is_completed' => true]);
+        event(new ActivityStreamUpdated((int) $activity->user_id, 'completed', (string) $activity->id));
 
         return response()->json(['ok' => true]);
     }

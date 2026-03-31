@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\ActivityStreamUpdated;
 use App\Http\Controllers\Api\Concerns\ResolvesAutomationTeam;
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
@@ -255,6 +256,7 @@ class LineInboundController extends Controller
             'priority' => $priority,
             'is_completed' => $validated['is_completed'] ?? false,
         ]);
+        event(new ActivityStreamUpdated((int) $activity->user_id, 'created', (string) $activity->id));
 
         return response()->json([
             'activity_id' => $activity->id,
