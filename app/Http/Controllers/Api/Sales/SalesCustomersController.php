@@ -76,6 +76,13 @@ class SalesCustomersController extends Controller
                 ->where('team_id', $team->id)
                 ->whereHas('stage', fn ($q) => $q->where('is_won', true))
                 ->sum('value');
+            $totalDeals = (int) Deal::where('customer_id', $c->id)
+                ->where('team_id', $team->id)
+                ->count();
+            $lastActivity = Activity::where('customer_id', $c->id)
+                ->where('team_id', $team->id)
+                ->orderByDesc('created_at')
+                ->first();
 
             return [
                 'id' => (int) $c->id,
@@ -86,6 +93,9 @@ class SalesCustomersController extends Controller
                 'province' => $c->province,
                 'is_active' => $c->status === 'active',
                 'lifetime_value' => (float) $lifetimeValue,
+                'total_deals' => $totalDeals,
+                'last_contacted' => $lastActivity?->created_at ? $lastActivity->created_at->toDateTimeString() : null,
+                'last_contacted_diff_human' => $lastActivity?->created_at ? $lastActivity->created_at->diffForHumans() : null,
                 'organization_name' => $c->organization?->name,
                 'avatar_url' => $this->resolveAvatarUrl($c->img_profile),
             ];
