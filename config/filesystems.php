@@ -33,7 +33,9 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // When true, Laravel registers GET /storage/{path} for this disk; the private
+            // disk is not public and requires signed URLs, which breaks normal avatar URLs.
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],
@@ -43,6 +45,8 @@ return [
             'root' => storage_path('app/public'),
             'url' => rtrim(env('APP_URL'), '/').'/storage',
             'visibility' => 'public',
+            // Serves /storage/* via Laravel when the PHP dev server cannot follow the symlink.
+            'serve' => true,
             'throw' => false,
             'report' => false,
         ],
