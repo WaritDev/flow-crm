@@ -58,14 +58,14 @@ class ActivityController extends Controller
                 };
 
                 $actionType = match ($a->activity_type) {
-                    'call' => 'โทร',
-                    'message' => 'ข้อความ',
-                    'line' => 'ทัก',
-                    'meeting' => 'ประชุม',
-                    'email' => 'อีเมล',
-                    'note' => 'โน้ต',
-                    'task' => 'งานต่อไป',
-                    default => 'งานต่อไป',
+                    'call' => 'Call',
+                    'message' => 'Message',
+                    'line' => 'LINE',
+                    'meeting' => 'Meeting',
+                    'email' => 'Email',
+                    'note' => 'Note',
+                    'task' => 'Next action',
+                    default => 'Next action',
                 };
 
                 $customerNickname = $customer?->nickname ?? $customer?->name ?? '-';
@@ -73,9 +73,9 @@ class ActivityController extends Controller
 
                 $warning = '';
                 if ($isOverdue) {
-                    $warning = 'เลยกำหนดแล้ว';
+                    $warning = 'Overdue';
                 } elseif ($isToday) {
-                    $warning = 'ถึงกำหนดวันนี้';
+                    $warning = 'Due today';
                 }
 
                 $time = $a->created_at ? $a->created_at->format('H:i') : '-';
@@ -126,7 +126,7 @@ class ActivityController extends Controller
             ->values()
             ->all();
 
-        // กันหน้าแสดงผลพัง กรณี seed/ข้อมูลยังไม่พอ
+        // Empty state placeholder when there is no activity data yet.
         if (count($activities) === 0) {
             $activities = [[
                 'id' => 0,
@@ -134,10 +134,10 @@ class ActivityController extends Controller
                 'priority_int' => 1,
                 'bucket_rank' => 2,
                 'due_date' => null,
-                'action_type' => 'งานต่อไป',
+                'action_type' => 'Next action',
                 'customer_nickname' => '-',
                 'customer_name' => '-',
-                'title' => 'ไม่มีงานที่ต้องทำ',
+                'title' => 'No tasks due',
                 'warning' => '',
                 'time' => '-',
                 'amount' => 0,

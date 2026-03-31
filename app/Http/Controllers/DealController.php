@@ -173,7 +173,7 @@ class DealController extends Controller
             'is_completed' => true,
         ]);
 
-        return redirect()->route('pipeline-stages.index')->with('success', 'สร้างดีลเรียบร้อยแล้ว');
+        return redirect()->route('pipeline-stages.index')->with('success', 'Deal created.');
     }
 
     /**
@@ -198,7 +198,7 @@ class DealController extends Controller
             ? $team->pipelineTemplate->stages
             : collect([]);
 
-        // ดึง Timeline กิจกรรม
+        // Activity timeline
         $activities = $deal->activities()->orderBy('created_at', 'desc')->get();
 
         return view('deals.edit', compact('deal', 'customers', 'activities', 'stages'));
@@ -228,7 +228,7 @@ class DealController extends Controller
 
         $customer = Customer::findOrFail($request->customer_id);
         if ((string) $customer->team_id !== (string) Auth::user()->getTeamId()) {
-            return back()->withErrors(['customer_id' => 'ลูกค้านี้ไม่อยู่ในทีมของคุณ']);
+            return back()->withErrors(['customer_id' => 'This customer is not in your team.']);
         }
 
         $stageId = $request->stage;
@@ -360,6 +360,6 @@ class DealController extends Controller
 
         $deal->delete();
 
-        return redirect()->route('pipeline-stages.index')->with('success', 'ลบดีลเรียบร้อยแล้ว');
+        return redirect()->route('pipeline-stages.index')->with('success', 'Deal deleted.');
     }
 }

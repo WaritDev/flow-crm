@@ -17,21 +17,21 @@ class PipelineTemplateSeeder extends Seeder
             [
                 'name' => 'Default Pipeline',
                 'industry' => 'General B2B',
-                'description' => 'เทมเพลตทั่วไปสำหรับทีมขาย B2B — Lead ถึงปิดดีล',
+                'description' => 'General B2B funnel from lead to closed deal.',
                 'is_default' => true,
                 'stages' => [
-                    ['name' => 'สนใจ (Prospect)', 'position' => 1, 'is_won' => false],
-                    ['name' => 'ติดต่อแล้ว (Contacted)', 'position' => 2, 'is_won' => false],
-                    ['name' => 'คัดกรองคุณภาพ (Qualified)', 'position' => 3, 'is_won' => false],
-                    ['name' => 'เสนอราคา (Quoted)', 'position' => 4, 'is_won' => false],
-                    ['name' => 'เจรจาต่อรอง (Negotiation)', 'position' => 5, 'is_won' => false],
-                    ['name' => 'ปิดการขาย (Won)', 'position' => 6, 'is_won' => true],
+                    ['name' => 'Prospect', 'position' => 1, 'is_won' => false],
+                    ['name' => 'Contacted', 'position' => 2, 'is_won' => false],
+                    ['name' => 'Qualified', 'position' => 3, 'is_won' => false],
+                    ['name' => 'Quoted', 'position' => 4, 'is_won' => false],
+                    ['name' => 'Negotiation', 'position' => 5, 'is_won' => false],
+                    ['name' => 'Closed Won', 'position' => 6, 'is_won' => true],
                 ],
             ],
             [
                 'name' => 'SaaS — Subscription sales',
                 'industry' => 'SaaS',
-                'description' => 'ลูกค้าซ้ำ / Subscription — โฟลว์คล้าย inbound + trial-to-paid',
+                'description' => 'Repeat customers / subscription — inbound and trial-to-paid style flow.',
                 'is_default' => false,
                 'stages' => [
                     ['name' => 'Lead / Inbound', 'position' => 1, 'is_won' => false],
@@ -45,7 +45,7 @@ class PipelineTemplateSeeder extends Seeder
             [
                 'name' => 'Real estate — Buy / sell',
                 'industry' => 'Real Estate',
-                'description' => 'โฟลว์นิยม: inquiry → นัดดูทรัพย์ → offer → closing',
+                'description' => 'Typical flow: inquiry → viewing → offer → closing.',
                 'is_default' => false,
                 'stages' => [
                     ['name' => 'New inquiry', 'position' => 1, 'is_won' => false],
@@ -59,7 +59,7 @@ class PipelineTemplateSeeder extends Seeder
             [
                 'name' => 'Insurance — Personal lines',
                 'industry' => 'Insurance',
-                'description' => 'โฟลว์ agent: lead → needs analysis → quote → bind',
+                'description' => 'Agent flow: lead → needs analysis → quote → bind.',
                 'is_default' => false,
                 'stages' => [
                     ['name' => 'Prospect', 'position' => 1, 'is_won' => false],

@@ -13,8 +13,8 @@
                     </svg>
                 </a>
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-900">สร้างดีลใหม่</h1>
-                    <p class="text-sm text-slate-500">กรอกข้อมูลเพื่อเริ่มติดตามยอดขาย</p>
+                    <h1 class="text-2xl font-bold text-slate-900">Create deal</h1>
+                    <p class="text-sm text-slate-500">Enter details to start tracking this opportunity.</p>
                 </div>
             </div>
 
@@ -23,7 +23,7 @@
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                สร้างดีล
+                Create deal
             </button>
         </div>
 

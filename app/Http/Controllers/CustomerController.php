@@ -59,7 +59,7 @@ class CustomerController extends Controller
         $customer->save();
 
         return redirect()->route('customers.index')
-            ->with('success', 'เพิ่มลูกค้าใหม่เรียบร้อยแล้ว');
+            ->with('success', 'Customer added.');
     }
 
     /**
@@ -89,7 +89,7 @@ class CustomerController extends Controller
             'line_id' => 'required|string|max:100',
         ]);
 
-        $data = $this->mapCustomerData($request); // ใช้ตัวกรองเดียวกัน
+        $data = $this->mapCustomerData($request);
 
         if ($request->hasFile('avatar')) {
             if ($customer->img_profile) Storage::disk('public')->delete($customer->img_profile);
@@ -98,7 +98,7 @@ class CustomerController extends Controller
 
         $customer->update($data);
 
-        return redirect()->route('customers.index')->with('success', 'แก้ไขสำเร็จ');
+        return redirect()->route('customers.index')->with('success', 'Customer updated.');
     }
 
     /**

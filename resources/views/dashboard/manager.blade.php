@@ -68,7 +68,7 @@
                     <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </div>
                 <p class="text-slate-400 text-sm mb-1">Total Revenue</p>
-                <h3 class="text-3xl font-bold">฿{{ number_format($stats['total_revenue']/1000000, 2) }}M</h3>
+                <h3 class="text-3xl font-bold">THB {{ number_format($stats['total_revenue']/1000000, 2) }}M</h3>
                 <p class="{{ $stats['revenue_growth'] >= 0 ? 'text-emerald-400' : 'text-red-400' }} text-xs mt-2 flex items-center gap-1">
                     <svg class="w-3 h-3 {{ $stats['revenue_growth'] < 0 ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -94,7 +94,7 @@
             <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
                 <p class="text-slate-500 text-sm mb-1">Active Deals (team)</p>
                 <h3 class="text-3xl font-bold text-slate-800">{{ $stats['active_deals'] }}</h3>
-                <p class="text-xs text-slate-400 mt-2">Pending value ฿{{ number_format($stats['active_deals_value']/1000000, 2) }}M</p>
+                <p class="text-xs text-slate-400 mt-2">Pending value THB {{ number_format($stats['active_deals_value']/1000000, 2) }}M</p>
             </div>
 
             <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
@@ -131,7 +131,7 @@
                             <div>
                                 <div class="flex justify-between text-sm mb-1.5">
                                     <span class="text-slate-700 font-medium">{{ $stage['stage'] }}</span>
-                                    <span class="text-slate-500 text-xs">{{ $stage['count'] }} deals (฿{{ number_format($stage['value']/1000) }}k)</span>
+                                    <span class="text-slate-500 text-xs">{{ $stage['count'] }} deals (THB {{ number_format($stage['value']/1000) }}k)</span>
                                 </div>
                                 <div class="w-full bg-slate-100 rounded-full h-2">
                                     <div class="bg-indigo-500 h-2 rounded-full" style="width: <?php echo $percent; ?>%;"></div>
@@ -206,7 +206,7 @@
                                     </div>
                                 </div>
                                 <span class="font-bold {{ $index == 0 ? 'text-amber-600' : 'text-slate-700' }}">
-                            ฿{{ number_format($sale['amount']/1000) }}K
+                            THB {{ number_format($sale['amount']/1000) }}K
                         </span>
                             </div>
                         @endforeach
@@ -241,16 +241,16 @@
                         <input type="hidden" name="month" value="{{ $reqMonth }}">
                         <input type="hidden" name="year" value="{{ $reqYear }}">
                         <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
-                            <label class="block text-sm font-bold text-slate-700 mb-1">Organization Target (฿)</label>
+                            <label class="block text-sm font-bold text-slate-700 mb-1">Organization target (THB)</label>
                             <p class="text-xs text-slate-500 mb-2">Total company sales target</p>
                             
                             <div x-data="{
                                 raw: '{{ $companyTargetAmount ?: '' }}',
                                 formatted: '{{ $companyTargetAmount ? number_format($companyTargetAmount) : '' }}',
                                 formatInput() {
-                                    let cleaned = this.formatted.replace(/\D/g, ''); // เอาตัวอักษรที่ไม่ใช่ตัวเลขออกให้หมด
+                                    let cleaned = this.formatted.replace(/\D/g, '');
                                     this.raw = cleaned;
-                                    this.formatted = cleaned ? new Intl.NumberFormat('en-US').format(cleaned) : ''; // จัดฟอร์แมตใส่ลูกน้ำ
+                                    this.formatted = cleaned ? new Intl.NumberFormat('en-US').format(cleaned) : '';
                                 }
                             }">
                                 <input type="text" x-model="formatted" @input="formatInput" placeholder="e.g. 5,000,000" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
@@ -336,7 +336,7 @@
                         padding: 10,
                         callbacks: {
                             label: function(context) {
-                                return context.dataset.label + ': ฿' + context.parsed.y.toLocaleString();
+                                return context.dataset.label + ': THB ' + context.parsed.y.toLocaleString();
                             }
                         }
                     }
@@ -345,7 +345,7 @@
                     y: {
                         beginAtZero: true,
                         grid: { borderDash: [2, 2], color: '#f1f5f9' },
-                        ticks: { callback: value => '฿' + (value/1000) + 'k' }
+                        ticks: { callback: value => 'THB ' + (value/1000) + 'k' }
                     },
                     x: { grid: { display: false } }
                 }

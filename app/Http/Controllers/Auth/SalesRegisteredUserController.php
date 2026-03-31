@@ -57,7 +57,7 @@ class SalesRegisteredUserController extends Controller
         if ($salesTeamId === null) {
             throw ValidationException::withMessages([
                 'invite_token' => [
-                    'Organization นี้ยังไม่มีทีม — ให้ผู้จัดการสร้างทีมในระบบก่อน แล้วค่อยเชิญ Sales',
+                    'This organization has no team yet. Ask a manager to create a team before inviting sales.',
                 ],
             ]);
         }

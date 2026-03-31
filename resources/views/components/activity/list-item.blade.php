@@ -32,7 +32,7 @@
             {{ $activity['time'] }}
         </div>
         <div class="font-bold text-slate-800 text-sm">
-            ฿{{ number_format($activity['amount']) }}
+            THB {{ number_format($activity['amount']) }}
         </div>
     </div>
 </div>

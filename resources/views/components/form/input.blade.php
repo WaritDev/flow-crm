@@ -18,7 +18,7 @@
         type="{{ $type }}"
         name="{{ $name }}"
         id="{{ $name }}"
-        value="{{ old($name, $value) }}" {{-- ลำดับความสำคัญ: ข้อมูลใหม่ที่พิมพ์ผิด > ข้อมูลจาก DB > ค่าว่าง --}}
+        value="{{ old($name, $value) }}" {{-- old input > model value > empty --}}
         placeholder="{{ $placeholder }}"
         @class([
             'w-full px-4 py-2.5 rounded-lg border transition-all text-slate-800 placeholder-gray-400 focus:outline-none focus:ring-2',

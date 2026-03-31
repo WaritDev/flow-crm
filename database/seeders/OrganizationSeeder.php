@@ -16,7 +16,7 @@ class OrganizationSeeder extends Seeder
             [
                 'name' => 'Somhai Clinic',
                 'size' => 'medium',
-                'description' => 'คลินิกความงามชั้นนำในกรุงเทพฯ ให้บริการครบวงจร',
+                'description' => 'Leading beauty clinic — full-service treatments.',
                 'invite_code' => 'CLINICA2026',
             ]
         );
@@ -26,7 +26,7 @@ class OrganizationSeeder extends Seeder
             [
                 'name' => 'Aunsit Mala',
                 'size' => 'small',
-                'description' => 'คลินิกความงามบูติก มุ่งเน้นการบริการส่วนบุคคล',
+                'description' => 'Boutique clinic focused on personalized care.',
                 'invite_code' => 'CLINICB2026',
             ]
         );
@@ -56,10 +56,10 @@ class OrganizationSeeder extends Seeder
 
         if ($template->stages()->count() === 0) {
             $stages = [
-                ['name' => 'สนใจ (Prospect)', 'position' => 1, 'is_won' => false],
-                ['name' => 'ติดต่อแล้ว (Contacted)', 'position' => 2, 'is_won' => false],
-                ['name' => 'เสนอราคา (Quoted)', 'position' => 3, 'is_won' => false],
-                ['name' => 'ปิดการขาย (Won)', 'position' => 5, 'is_won' => true],
+                ['name' => 'Prospect', 'position' => 1, 'is_won' => false],
+                ['name' => 'Contacted', 'position' => 2, 'is_won' => false],
+                ['name' => 'Quoted', 'position' => 3, 'is_won' => false],
+                ['name' => 'Closed Won', 'position' => 5, 'is_won' => true],
             ];
             foreach ($stages as $stage) {
                 $template->stages()->create($stage);

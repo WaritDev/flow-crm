@@ -1,7 +1,7 @@
 @props(['template'])
 
 @php
-    // Map สีตามที่ส่งมา (Tailwind class map)
+    // Tailwind class map by color key
     $colors = [
         'pink' =>   ['bg' => 'bg-pink-100',   'text' => 'text-pink-500', 'hover' => 'group-hover:bg-pink-200'],
         'orange' => ['bg' => 'bg-orange-100', 'text' => 'text-orange-500', 'hover' => 'group-hover:bg-orange-200'],
@@ -18,7 +18,7 @@
 
     @if($template['is_popular'])
         <span class="absolute top-4 right-4 bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded-full">
-            ยอดนิยม
+            Popular
         </span>
     @endif
 
@@ -39,8 +39,7 @@
             @endif
         </div>
 
-        <h3 class="text-lg font-bold text-slate-800">{{ $template['title_th'] }}</h3>
-        <p class="text-sm text-slate-400 font-medium">{{ $template['title_en'] }}</p>
+        <h3 class="text-lg font-bold text-slate-800">{{ $template['title_en'] ?? $template['title_th'] ?? '' }}</h3>
     </div>
 
     <p class="text-slate-500 text-sm leading-relaxed mb-6 flex-grow">
@@ -62,7 +61,7 @@
 
     <div class="mb-6">
         <p class="text-xs text-slate-400">
-            รวม {{ $template['script_count'] }} Script ภาษาไทย
+            {{ $template['script_count'] }} sales scripts included
         </p>
     </div>
 
@@ -70,7 +69,7 @@
         @csrf
         <input type="hidden" name="template_id" value="{{ $template['id'] }}">
         <button type="submit" class="w-full py-2.5 px-4 rounded-lg border border-gray-200 text-slate-700 font-semibold text-sm hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all flex items-center justify-center gap-2">
-            เลือก Template นี้
+            Select this template
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>

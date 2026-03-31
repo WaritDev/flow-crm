@@ -10,14 +10,14 @@
                     @php
                         $daysInStage = now()->diffInDays($deal->updated_at);
                         $healthColor = $daysInStage > 7 ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700';
-                        $healthText = $daysInStage > 7 ? 'Stagnant (นิ่งนานเกิน)' : 'Healthy (สดใหม่)';
+                        $healthText = $daysInStage > 7 ? 'Stagnant' : 'Healthy';
                     @endphp
                     <span class="{{ $healthColor }} px-2.5 py-0.5 rounded-full text-xs font-bold">
                         {{ $healthText }}
                     </span>
                 </div>
                 <p class="text-sm text-slate-500 mt-1">
-                    ลูกค้า: <strong>{{ $deal->customer->name }} ({{ $deal->customer->nickname }})</strong> • สร้างเมื่อ
+                    Customer: <strong>{{ $deal->customer->name }} ({{ $deal->customer->nickname }})</strong> • Created
                     {{ $deal->created_at->format('d M Y') }}
                 </p>
             </div>
@@ -25,7 +25,7 @@
             <div class="flex gap-3">
                 <button type="submit" form="editDealForm"
                     class="px-6 py-2.5 bg-slate-900 text-white rounded-lg font-medium shadow-lg hover:bg-slate-800 transition-all">
-                    บันทึกการเปลี่ยนแปลง
+                    Save changes
                 </button>
             </div>
         </div>
@@ -53,9 +53,9 @@
                     </div>
                     <div
                         class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm text-slate-600 italic mb-3 relative group">
-                        "สวัสดีครับ คุณ{{ $deal->customer->nickname }} ผมส่งใบเสนอราคาให้พิจารณา..."
+                        "Hi {{ $deal->customer->nickname }}, here's the quote for your review…"
                     </div>
-                    <button onclick="navigator.clipboard.writeText('ข้อความสคริปต์...')"
+                    <button onclick="navigator.clipboard.writeText('Sample script…')"
                         class="w-full py-2 border border-emerald-200 text-emerald-600 rounded-lg hover:bg-emerald-50 text-sm font-bold transition-colors flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -66,7 +66,7 @@
                 </div>
 
                 <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-                    <h3 class="font-bold text-slate-800 mb-4">Timeline กิจกรรม</h3>
+                    <h3 class="font-bold text-slate-800 mb-4">Activity timeline</h3>
                     <div class="relative border-l-2 border-slate-200 ml-3 space-y-6">
                         @foreach($activities as $activity)
                             <div class="relative pl-6">
@@ -74,7 +74,7 @@
                                     {{ $activity->is_completed ? 'bg-slate-300' : 'bg-emerald-500' }}"></div>
 
                                 <p class="text-sm font-bold text-slate-800">{{ $activity->title }}</p>
-                                <p class="text-xs text-slate-500">{{ $activity->created_at->diffForHumans() }} โดย
+                                <p class="text-xs text-slate-500">{{ $activity->created_at->diffForHumans() }} by
                                     {{ $activity->user->name }}</p>
                             </div>
                         @endforeach

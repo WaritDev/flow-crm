@@ -54,7 +54,7 @@
                 </div>
             </div>
             <h1 class="text-3xl font-bold text-slate-800 tracking-tight">FlowCRM</h1>
-            <p class="text-slate-500 text-sm mt-2">สมัครผู้จัดการ — สร้างองค์กรและรหัสเชิญทีมขาย (Sales สมัครผ่านแอปหน้าอื่น)</p>
+            <p class="text-slate-500 text-sm mt-2">Manager sign-up — create your organization and sales invite codes. (Sales register in the SvelteKit app.)</p>
         </div>
 
         <div class="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
@@ -68,63 +68,63 @@
                 <div x-show="step === 1" x-transition.opacity.duration.300ms id="step1">
                     <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
                         <span class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-600">1</span>
-                        บัญชีผู้จัดการ
+                        Manager account
                     </h2>
                     <div class="space-y-5">
                         <div>
-                            <x-input-label for="name" value="ชื่อ–นามสกุล" />
+                            <x-input-label for="name" value="Full name" />
                             <x-text-input id="name" class="block mt-1 w-full px-4 py-2" type="text" name="name" :value="old('name')" required autofocus
                                 placeholder="Somchai Yingrak"
                                 x-bind:class="nameError ? 'border-red-500' : ''" @input="nameError = false" />
-                            <p x-show="nameError" style="display: none;" class="text-sm text-red-600 mt-1">กรุณากรอกชื่อและนามสกุล</p>
+                            <p x-show="nameError" style="display: none;" class="text-sm text-red-600 mt-1">Please enter first and last name</p>
                             <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
                         <div>
-                            <x-input-label for="email" value="อีเมล" />
+                            <x-input-label for="email" value="Email" />
                             <x-text-input id="email" class="block mt-1 w-full px-4 py-2" type="email" name="email" :value="old('email')" required />
                             <x-input-error :messages="$errors->get('email')" class="mt-2" />
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <x-input-label for="password" value="รหัสผ่าน" />
+                                <x-input-label for="password" value="Password" />
                                 <x-text-input id="password" class="block mt-1 w-full px-4 py-2" type="password" name="password" required
                                     x-bind:class="passwordLengthError ? 'border-red-500' : ''" @input="passwordLengthError = false" />
                             </div>
                             <div>
-                                <x-input-label for="password_confirmation" value="ยืนยัน" />
+                                <x-input-label for="password_confirmation" value="Confirm" />
                                 <x-text-input id="password_confirmation" class="block mt-1 w-full px-4 py-2" type="password" name="password_confirmation" required
                                     x-bind:class="passwordError ? 'border-red-500' : ''" @input="passwordError = false" />
                             </div>
                         </div>
-                        <p x-show="passwordLengthError" style="display: none;" class="text-sm text-red-600">รหัสผ่านอย่างน้อย 8 ตัวอักษร</p>
-                        <p x-show="passwordError" style="display: none;" class="text-sm text-red-600">รหัสผ่านไม่ตรงกัน</p>
+                        <p x-show="passwordLengthError" style="display: none;" class="text-sm text-red-600">Password must be at least 8 characters</p>
+                        <p x-show="passwordError" style="display: none;" class="text-sm text-red-600">Passwords do not match</p>
                     </div>
                     <div class="mt-8 pt-4 border-t border-slate-50 flex justify-between items-center">
-                        <a href="{{ route('login') }}" class="text-sm font-medium text-slate-500 hover:text-emerald-600">มีบัญชีแล้ว</a>
-                        <button type="button" @click="next()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-bold">ถัดไป</button>
+                        <a href="{{ route('login') }}" class="text-sm font-medium text-slate-500 hover:text-emerald-600">Already have an account</a>
+                        <button type="button" @click="next()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-bold">Next</button>
                     </div>
                 </div>
 
                 <div x-show="step === 2" x-cloak x-transition.opacity.duration.300ms>
                     <div class="mb-6">
                         <button type="button" @click="step = 1" class="text-xs font-bold text-slate-400 hover:text-emerald-600 mb-4 flex items-center gap-1">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> กลับ
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Back
                         </button>
                         <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
                             <span class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-600">2</span>
-                            ตั้งค่าองค์กร
+                            Organization
                         </h2>
                     </div>
                     <div class="space-y-4">
                         <div>
-                            <x-input-label for="org_name" value="ชื่อองค์กร" />
+                            <x-input-label for="org_name" value="Organization name" />
                             <x-text-input id="org_name" class="block mt-1 w-full px-4 py-2" type="text" name="org_name" :value="old('org_name')" required placeholder="Acme Corp" />
                             <x-input-error :messages="$errors->get('org_name')" class="mt-2" />
                         </div>
                         <div>
-                            <x-input-label for="org_size" value="ขนาดบริษัท" />
+                            <x-input-label for="org_size" value="Company size" />
                             <select name="org_size" required class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl shadow-sm text-sm py-2.5">
-                                <option value="" disabled {{ old('org_size') ? '' : 'selected' }}>เลือก...</option>
+                                <option value="" disabled {{ old('org_size') ? '' : 'selected' }}>Select…</option>
                                 <option value="1-10" @selected(old('org_size') === '1-10')>1–10</option>
                                 <option value="11-50" @selected(old('org_size') === '11-50')>11–50</option>
                                 <option value="50+" @selected(old('org_size') === '50+')>50+</option>
@@ -132,13 +132,13 @@
                             <x-input-error :messages="$errors->get('org_size')" class="mt-2" />
                         </div>
                         <div>
-                            <x-input-label for="org_description" value="คำอธิบาย (ไม่บังคับ)" />
+                            <x-input-label for="org_description" value="Description (optional)" />
                             <textarea id="org_description" name="org_description" rows="2" class="block mt-1 w-full border-gray-300 rounded-xl shadow-sm text-sm">{{ old('org_description') }}</textarea>
                             <x-input-error :messages="$errors->get('org_description')" class="mt-2" />
                         </div>
                     </div>
                     <div class="mt-8 pt-4 border-t border-slate-50">
-                        <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold">สร้างองค์กรและเข้าสู่ระบบ</button>
+                        <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold">Create organization and sign in</button>
                     </div>
                 </div>
             </form>

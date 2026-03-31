@@ -2,12 +2,12 @@
 
 @section('content')
     <div class="max-w-3xl mx-auto py-10 px-4">
-        <h1 class="text-2xl font-bold text-slate-900">แก้ไข: {{ $template->name }}</h1>
+        <h1 class="text-2xl font-bold text-slate-900">Edit: {{ $template->name }}</h1>
 
         @if($teamsAssigned)
             <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-900 px-4 py-3 text-sm">
-                มีทีมผูก template นี้อยู่ — คุณแก้<strong>ชื่อ / อุตสาหกรรม / คำอธิบาย</strong>ได้เท่านั้น
-                หากต้องการเปลี่ยนลำดับ stage ให้ยกเลิกการผูกทีมก่อน (ทีมที่ยังไม่มีดีลเท่านั้น)
+                A team is assigned to this template — you can only change the <strong>name, industry, and description</strong>.
+                To reorder stages, unassign the team first (teams with no deals only).
             </div>
         @endif
 
@@ -16,18 +16,18 @@
             @method('PUT')
 
             <div>
-                <label class="block text-sm font-semibold text-slate-700">ชื่อ template</label>
+                <label class="block text-sm font-semibold text-slate-700">Template name</label>
                 <input type="text" name="name" value="{{ old('name', $template->name) }}" required
                        class="mt-1 w-full rounded-lg border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                 @error('name') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
             <div>
-                <label class="block text-sm font-semibold text-slate-700">อุตสาหกรรม</label>
+                <label class="block text-sm font-semibold text-slate-700">Industry</label>
                 <input type="text" name="industry" value="{{ old('industry', $template->industry) }}"
                        class="mt-1 w-full rounded-lg border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"/>
             </div>
             <div>
-                <label class="block text-sm font-semibold text-slate-700">คำอธิบาย</label>
+                <label class="block text-sm font-semibold text-slate-700">Description</label>
                 <textarea name="description" rows="2" class="mt-1 w-full rounded-lg border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500">{{ old('description', $template->description) }}</textarea>
             </div>
 
@@ -56,16 +56,16 @@
             @endif
 
             <div class="flex gap-3">
-                <button type="submit" class="rounded-xl bg-emerald-600 text-white font-bold px-6 py-2.5 hover:bg-emerald-700">บันทึก</button>
-                <a href="{{ route('pipeline-templates.index') }}" class="rounded-xl border border-slate-200 px-6 py-2.5 text-slate-700 font-medium">กลับ</a>
+                <button type="submit" class="rounded-xl bg-emerald-600 text-white font-bold px-6 py-2.5 hover:bg-emerald-700">Save</button>
+                <a href="{{ route('pipeline-templates.index') }}" class="rounded-xl border border-slate-200 px-6 py-2.5 text-slate-700 font-medium">Back</a>
             </div>
         </form>
 
         <form method="POST" action="{{ route('pipeline-templates.destroy', $template) }}" class="mt-8"
-              onsubmit="return confirm('ลบ template นี้? ต้องไม่มีทีมผูกอยู่');">
+              onsubmit="return confirm('Delete this template? No team may be assigned.');">
             @csrf
             @method('DELETE')
-            <button type="submit" class="text-sm text-red-600 font-semibold hover:underline">ลบ template นี้</button>
+            <button type="submit" class="text-sm text-red-600 font-semibold hover:underline">Delete this template</button>
         </form>
     </div>
 @endsection

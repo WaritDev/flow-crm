@@ -20,7 +20,7 @@
 
             @if(!empty($tags))
                 <div class="flex flex-wrap gap-1 mt-2">
-                    @foreach(array_slice($tags, 0, 2) as $tag) {{-- โชว์แค่ 2 อันแรกป้องกันล้น --}}
+                    @foreach(array_slice($tags, 0, 2) as $tag) {{-- show first 2 tags --}}
                     <span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">#{{ $tag }}</span>
                     @endforeach
                     @if(count($tags) > 2)

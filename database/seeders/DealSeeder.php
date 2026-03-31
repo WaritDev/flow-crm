@@ -29,7 +29,7 @@ class DealSeeder extends Seeder
 
             $stage = $stages->random();
 
-            // ให้ next_action_date มีค่า Overdue / Today / Future สำหรับ demo Action Stream
+            // next_action_date: overdue / today / future for demo Action Stream
             $bucket = fake()->randomElement(['overdue', 'today', 'future']);
             $timeHour = fake()->numberBetween(9, 17);
             $nextActionDate = match ($bucket) {
@@ -40,16 +40,23 @@ class DealSeeder extends Seeder
             $nextActionDate = $nextActionDate->setTime($timeHour, 0, 0);
 
             $nextActionsByStage = [
-                'สนใจ' => 'ทักเพื่อขอข้อมูลเพิ่มเติมทาง LINE',
-                'คัดกรอง' => 'คัดกรองความต้องการและผู้ตัดสินใจ',
-                'ติดต่อแล้ว' => 'นัดหมายเพื่อคุยรายละเอียดให้ชัดเจน',
-                'เสนอราคา' => 'ส่งใบเสนอราคาและถามความคืบหน้าผ่าน LINE',
-                'เจรจา' => 'ต่อรองราคา/เงื่อนไขและขอเอกสารเพิ่มเติม',
-                'ปิดการขาย' => 'ยืนยันการเซ็นสัญญาและขั้นตอนถัดไป',
-                'สูญเสีย' => 'ติดตามผลหลังดีลจบ',
+                'Prospect' => 'Reach out on LINE for more context',
+                'Qualified' => 'Confirm needs and decision makers',
+                'Contacted' => 'Schedule a detail call',
+                'Quoted' => 'Send quote and check progress on LINE',
+                'Negotiation' => 'Align on price, terms, and paperwork',
+                'Closed Won' => 'Confirm contract and handoff',
+                'Closed lost' => 'Review closed-lost and log learnings',
+                'สนใจ' => 'Reach out on LINE for more context',
+                'คัดกรอง' => 'Confirm needs and decision makers',
+                'ติดต่อแล้ว' => 'Schedule a detail call',
+                'เสนอราคา' => 'Send quote and check progress on LINE',
+                'เจรจา' => 'Align on price, terms, and paperwork',
+                'ปิดการขาย' => 'Confirm contract and handoff',
+                'สูญเสีย' => 'Review closed-lost and log learnings',
             ];
 
-            $nextAction = 'ทักเพื่อให้ข้อมูลเพิ่มเติม';
+            $nextAction = 'Plan the next touchpoint';
             foreach ($nextActionsByStage as $key => $value) {
                 if (str_contains($stage->name, $key)) {
                     $nextAction = $value;
@@ -65,13 +72,14 @@ class DealSeeder extends Seeder
             if ((bool) $stage->is_won) {
                 $wonAt = $nextActionDate->copy()->addDays(fake()->numberBetween(5, 30));
             }
-            if (str_contains($stage->name, 'สูญเสีย') || str_contains(mb_strtolower($stage->name), 'lost')) {
+            $sn = mb_strtolower((string) $stage->name);
+            if ((str_contains($sn, 'lost') && ! str_contains($sn, 'won')) || str_contains($stage->name, 'สูญเสีย')) {
                 $lostAt = $nextActionDate->copy()->addDays(fake()->numberBetween(5, 30));
             }
 
             Deal::create([
                 'organization_id' => $customer->organization_id,
-                'name' => 'ดีลสำหรับ '.$customer->name,
+                'name' => 'Deal — '.$customer->name,
                 'customer_id' => $customer->id,
                 'user_id' => $customer->user_id,
                 'team_id' => $customer->team_id,

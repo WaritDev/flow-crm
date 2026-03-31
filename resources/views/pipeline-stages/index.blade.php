@@ -7,8 +7,8 @@
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Sales Pipeline</h1>
                 <p class="text-slate-500 mt-1">
-                    มูลค่ารวม <span
-                        class="font-bold text-slate-800">฿{{ number_format(collect($deals)->sum('value')) }}</span>
+                    Total value <span
+                        class="font-bold text-slate-800">THB {{ number_format(collect($deals)->sum('value')) }}</span>
                 </p>
             </div>
 
@@ -19,7 +19,7 @@
                         <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
-                        เพิ่ม Stage
+                        Add stage
                     </button>
                 @endcan
 
@@ -28,7 +28,7 @@
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    เพิ่มดีลใหม่
+                    New deal
                 </button>
             </div>
         </div>
@@ -85,7 +85,7 @@
                 drop(event, targetStageId, targetIndex) {
                     event.target.style.opacity = '1';
                     if (targetIndex < this.sourceStageIndex) {
-                        this.triggerToast('ห้ามย้อนสถานะการขาย เพื่อรักษาความถูกต้องของ Process');
+                        this.triggerToast('Cannot move a deal to an earlier stage');
                         return;
                     }
                     if (targetIndex === this.sourceStageIndex) {

@@ -10,20 +10,20 @@
         },
         copyScript() {
             navigator.clipboard.writeText(this.activeActivity.script);
-            alert('คัดลอกข้อความแล้ว!');
+            alert('Copied to clipboard');
         }
      }">
 
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Action Stream</h1>
-                <p class="text-slate-500 mt-1">กิจกรรมที่ต้องทำ เรียงตามความสำคัญ</p>
+                <p class="text-slate-500 mt-1">Open tasks, ordered by priority</p>
             </div>
 
             <div class="flex bg-white p-1 rounded-lg border border-slate-200 shadow-sm">
-                <button class="px-4 py-1.5 rounded-md text-sm font-medium bg-slate-800 text-white shadow-sm">ทั้งหมด</button>
-                <button class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-50">ด่วน</button>
-                <button class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-50">ปานกลาง</button>
+                <button class="px-4 py-1.5 rounded-md text-sm font-medium bg-slate-800 text-white shadow-sm">All</button>
+                <button class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-50">Urgent</button>
+                <button class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-50">Medium</button>
             </div>
         </div>
 
@@ -44,24 +44,24 @@
                             <div class="flex items-center gap-3 mb-2">
                                 <x-activity.priority-badge priority="activeActivity.priority" class="text-lg px-3 py-1" />
                                 <span class="text-slate-500 text-sm flex items-center gap-1">
-                                กำหนด <span x-text="activeActivity.time"></span>
+                                Due <span x-text="activeActivity.time"></span>
                             </span>
                             </div>
                             <h2 class="text-2xl font-bold text-slate-800">
-                                <span class="text-emerald-500" x-text="'[' + activeActivity.action_type + ' LINE]'"></span>
+                                <span class="text-emerald-500" x-text="'[' + activeActivity.action_type + ']'"></span>
                                 <span x-text="activeActivity.customer_name"></span>
                             </h2>
                             <p class="text-slate-500 mt-1" x-text="activeActivity.title"></p>
                         </div>
                         <div class="text-right">
-                            <p class="text-xs text-slate-400 mb-1">มูลค่าดีล</p>
-                            <p class="text-3xl font-bold text-emerald-500" x-text="'฿' + new Intl.NumberFormat().format(activeActivity.amount)"></p>
+                            <p class="text-xs text-slate-400 mb-1">Deal value</p>
+                            <p class="text-3xl font-bold text-emerald-500" x-text="'THB ' + new Intl.NumberFormat().format(activeActivity.amount)"></p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-3 gap-4 mb-6">
                         <div class="bg-slate-50 p-4 rounded-xl">
-                            <p class="text-xs text-slate-400 mb-1">ชื่อเล่น</p>
+                            <p class="text-xs text-slate-400 mb-1">Nickname</p>
                             <p class="font-bold text-slate-800 text-lg" x-text="activeActivity.customer_nickname"></p>
                         </div>
                         <div class="bg-slate-50 p-4 rounded-xl">
@@ -69,7 +69,7 @@
                             <p class="font-bold text-slate-800 text-lg" x-text="activeActivity.line_id"></p>
                         </div>
                         <div class="bg-slate-50 p-4 rounded-xl">
-                            <p class="text-xs text-slate-400 mb-1">ติดต่อล่าสุด</p>
+                            <p class="text-xs text-slate-400 mb-1">Last contact</p>
                             <p class="font-bold text-slate-800 text-lg" x-text="activeActivity.last_contact"></p>
                         </div>
                     </div>
@@ -79,13 +79,13 @@
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                         </div>
                         <div>
-                            <h4 class="font-bold text-amber-600">สัญญาณ</h4>
+                            <h4 class="font-bold text-amber-600">Notice</h4>
                             <p class="text-slate-600 text-sm" x-text="activeActivity.warning"></p>
                         </div>
                     </div>
 
                     <div class="mb-8">
-                        <p class="text-sm font-semibold text-slate-500 mb-2">Script สำหรับส่ง</p>
+                        <p class="text-sm font-semibold text-slate-500 mb-2">Message script</p>
                         <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 text-slate-700 leading-relaxed text-lg shadow-inner">
                             <p x-text="activeActivity.script"></p>
                         </div>
@@ -105,7 +105,7 @@
                     <div class="text-center">
                         <button class="text-emerald-500 hover:text-emerald-600 font-medium text-sm flex items-center justify-center gap-1 mx-auto transition-colors">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            ทำเสร็จแล้ว
+                            Mark complete
                         </button>
                     </div>
 

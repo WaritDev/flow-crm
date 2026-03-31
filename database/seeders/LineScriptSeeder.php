@@ -2,17 +2,13 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
+use App\Models\LineScript;
 use App\Models\PipelineStage;
 use App\Models\Team;
-use App\Models\LineScript;
+use Illuminate\Database\Seeder;
 
 class LineScriptSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $stages = PipelineStage::all();
@@ -22,8 +18,8 @@ class LineScriptSeeder extends Seeder
             foreach ($stages as $stage) {
                 $content = $this->scriptForStage($stage->name);
 
-                if (!$content) {
-                    $content = 'สวัสดีครับคุณ {nickname} ผมขอส่งรายละเอียดเพิ่มเติมเกี่ยวกับดีลของคุณ (มูลค่าโดยประมาณ {amount} บาท) รบกวนยืนยันขั้นตอนถัดไปได้ไหมครับ? หากสะดวกสามารถตอบกลับผ่านไลน์นี้ได้เลย: {line_id}';
+                if (! $content) {
+                    $content = 'Hi {nickname}, following up on your deal (about THB {amount}). Can you confirm the next step? Reply here on LINE: {line_id}';
                 }
 
                 LineScript::updateOrCreate(
@@ -43,28 +39,30 @@ class LineScriptSeeder extends Seeder
 
     private function scriptForStage(string $stageName): ?string
     {
-        if (str_contains($stageName, 'สนใจ') || str_contains($stageName, 'Prospect')) {
-            return 'สวัสดีครับคุณ {nickname} ขอบคุณที่สนใจโครงการครับ ผมขอข้อมูลเพิ่มเติม/นัดเวลาสั้นๆ ได้ไหมครับ? (ยอดดีลโดยประมาณ {amount} บาท) ถ้าสะดวกตอบกลับได้เลยผ่านไลน์นี้: {line_id}';
+        $sn = mb_strtolower($stageName);
+
+        if (str_contains($stageName, 'สนใจ') || str_contains($sn, 'prospect') || str_contains($sn, 'lead') || str_contains($sn, 'inbound')) {
+            return 'Hi {nickname}, thanks for your interest. Can I get a bit more context or a quick time to chat? Deal size roughly THB {amount}. Reply on LINE: {line_id}';
         }
 
-        if (str_contains($stageName, 'ติดต่อแล้ว') || str_contains($stageName, 'Contacted')) {
-            return 'ขอบคุณครับคุณ {nickname} สำหรับการติดต่อ วันนี้ผมขอสรุปขั้นตอนต่อไปและนัดเวลาพูดคุยให้เหมาะกับคุณครับ ยอดดีลโดยประมาณ {amount} บาท รบกวนยืนยันเวลาที่สะดวกได้เลย: {line_id}';
+        if (str_contains($stageName, 'ติดต่อแล้ว') || str_contains($sn, 'contact')) {
+            return 'Hi {nickname}, thanks for connecting. I will confirm next steps and a time that works for you. Roughly THB {amount}. Reply on LINE: {line_id}';
         }
 
-        if (str_contains($stageName, 'เสนอราคา') || str_contains($stageName, 'Quoted')) {
-            return 'สวัสดีครับคุณ {nickname} ผมส่งใบเสนอราคาให้แล้วนะครับ รบกวนตรวจสอบและบอกความคืบหน้าได้ไหมครับ? (มูลค่าประมาณ {amount} บาท) หากมีคำถามตอบกลับผ่านไลน์นี้ได้เลย: {line_id}';
+        if (str_contains($stageName, 'เสนอราคา') || str_contains($sn, 'quoted') || str_contains($sn, 'quote') || str_contains($sn, 'proposal')) {
+            return 'Hi {nickname}, I sent the quote — please review and let me know where we stand (~THB {amount}). Questions welcome on LINE: {line_id}';
         }
 
-        if (str_contains($stageName, 'เจรจา') || str_contains($stageName, 'Negotiation')) {
-            return 'สวัสดีครับคุณ {nickname} เพื่อความชัดเจน ผมขอสรุปเงื่อนไข/โปรโมชั่นที่เหมาะกับคุณ {customer_name} อีกครั้งครับ ยอดดีลโดยประมาณ {amount} บาท รบกวนยืนยันเอกสารขั้นตอนถัดไปได้ไหมครับ: {line_id}';
+        if (str_contains($stageName, 'เจรจา') || str_contains($sn, 'negotiation')) {
+            return 'Hi {nickname}, summarizing terms for {customer_name} (~THB {amount}). Please confirm documents / next step on LINE: {line_id}';
         }
 
-        if (str_contains($stageName, 'ปิดการขาย') || str_contains($stageName, 'Won')) {
-            return 'ยินดีด้วยครับคุณ {nickname} สำหรับขั้นตอนถัดไป ผมขอให้คุณยืนยันการเซ็นสัญญาและรับรายละเอียดการนัดหมายครับ ยอดดีลประมาณ {amount} บาท หากต้องการติดต่อเร่งด่วนตอบกลับไลน์นี้ได้เลย: {line_id}';
+        if (str_contains($stageName, 'ปิดการขาย') || str_contains($sn, 'closed won') || (str_contains($sn, 'won') && ! str_contains($sn, 'lost'))) {
+            return 'Hi {nickname}, congrats on moving forward. Please confirm signing and scheduling. Amount ~THB {amount}. Reach me on LINE: {line_id}';
         }
 
-        if (str_contains($stageName, 'สูญเสีย') || str_contains(mb_strtolower($stageName), 'lost')) {
-            return 'สวัสดีครับคุณ {nickname} ผมขออนุญาตติดตามหลังปิดดีลนะครับ หากยังสนใจบริการ/ข้อเสนอเดิม ผมสามารถส่งรายละเอียดและทางเลือกเพิ่มเติมให้ได้เลยครับ ติดต่อกลับผ่านไลน์นี้: {line_id}';
+        if (str_contains($stageName, 'สูญเสีย') || (str_contains($sn, 'lost') && ! str_contains($sn, 'won'))) {
+            return 'Hi {nickname}, checking in after we closed this one. If timing changes, I can resend options. LINE: {line_id}';
         }
 
         return null;

@@ -13,7 +13,7 @@
         'normal' => 'bg-emerald-50 text-emerald-600',
     ];
 
-    $labels = ['urgent' => 'ด่วน', 'medium' => 'ปานกลาง', 'normal' => 'ปกติ'];
+    $labels = ['urgent' => 'Urgent', 'medium' => 'Medium', 'normal' => 'Normal'];
 @endphp
 
 <div class="group flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border-b border-slate-50 hover:bg-slate-50/50 transition-colors border-l-4 {{ $borderColors[$activity['priority']] }} last:border-b-0">

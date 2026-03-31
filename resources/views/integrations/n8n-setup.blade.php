@@ -4,7 +4,7 @@
             <div class="mb-8">
                 <h1 class="text-2xl font-bold text-slate-900">Integrations Setup (n8n + LINE OA)</h1>
                 <p class="text-slate-600 mt-2">
-                    ใช้หน้านี้เพื่อเชื่อม n8n (Bearer token) และตั้งค่า Webhook URL สำหรับ LINE OA (Messaging API)
+                    Connect n8n (Bearer token) and configure the Webhook URL for LINE OA (Messaging API).
                 </p>
             </div>
 
@@ -33,7 +33,7 @@
 
                     @if(session('n8n_plain_text_token'))
                         <div class="mb-3 text-sm text-emerald-700 font-semibold">
-                            สร้าง token ใหม่แล้ว (แสดงครั้งเดียว) — กรุณาคัดลอกไปเก็บใน n8n Credentials
+                            New token created (shown once) — copy it into n8n Credentials
                         </div>
                         <div class="flex items-start gap-3">
                             <textarea readonly class="w-full min-h-[80px] rounded-xl border border-slate-200 bg-slate-50 p-3 font-mono text-xs">{{ session('n8n_plain_text_token') }}</textarea>
@@ -45,7 +45,7 @@
                         </div>
                     @elseif($plainTextToken)
                         <div class="mb-3 text-sm text-emerald-700 font-semibold">
-                            token สำหรับ n8n (แสดงครั้งเดียว) — กรุณาคัดลอกไปเก็บใน n8n Credentials
+                            n8n token (shown once) — copy it into n8n Credentials
                         </div>
                         <div class="flex items-start gap-3">
                             <textarea readonly class="w-full min-h-[80px] rounded-xl border border-slate-200 bg-slate-50 p-3 font-mono text-xs">{{ $plainTextToken }}</textarea>
@@ -57,7 +57,7 @@
                         </div>
                     @else
                         <p class="text-sm text-slate-600">
-                            token ถูกสร้างไว้แล้ว (เราไม่เก็บค่า token แบบ plain text) ถ้าต้องการใหม่ให้กด “Rotate Token”
+                            A token already exists (we do not store plain text). Use “Rotate Token” to issue a new one.
                         </p>
                     @endif
 
@@ -70,27 +70,27 @@
                             </button>
                         </form>
                         <p class="text-xs text-slate-500">
-                            แนะนำให้ rotate เป็นระยะ และ revoke ทันทีถ้าพบความผิดปกติ
+                            Rotate periodically and revoke immediately if you see anything suspicious.
                         </p>
                     </div>
                 </div>
 
                 <div class="bg-white border border-slate-200 rounded-xl p-5">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">LINE OA Webhook URL (ใส่ใน LINE Developers)</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">LINE OA webhook URL (paste in LINE Developers)</p>
                     <p class="text-sm text-slate-600 mb-3">
-                        URL นี้ชี้ไปที่ n8n Webhook (บน managed n8n ของเรา) โดยใช้ path เฉพาะขององค์กรนี้
+                        This URL targets the n8n Webhook (managed n8n) using this organization’s path.
                     </p>
                     @if(!$n8nBaseUrl)
                         <div class="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-                            ยังไม่ได้ตั้งค่า <span class="font-mono font-semibold">N8N_URL</span> ใน <span class="font-mono">.env</span>
-                            เลยไม่สามารถสร้างลิงก์ Webhook URL แบบเต็มได้
+                            <span class="font-mono font-semibold">N8N_URL</span> is not set in <span class="font-mono">.env</span>,
+                            so the full webhook URL cannot be built.
                             <div class="mt-2 text-xs text-amber-800">
-                                ตัวอย่าง: <span class="font-mono">N8N_URL=https://xxxx.ngrok-free.app</span>
+                                Example: <span class="font-mono">N8N_URL=https://xxxx.ngrok-free.app</span>
                             </div>
                         </div>
                     @endif
                     <div class="flex items-start gap-3">
-                        <textarea readonly class="w-full min-h-[70px] rounded-xl border border-slate-200 bg-slate-50 p-3 font-mono text-xs">{{ $webhookUrl ?: ('(ตั้งค่า N8N_URL ก่อน) Path: ' . ($integration->line_webhook_path ?? '')) }}</textarea>
+                        <textarea readonly class="w-full min-h-[70px] rounded-xl border border-slate-200 bg-slate-50 p-3 font-mono text-xs">{{ $webhookUrl ?: ('(Set N8N_URL first) Path: ' . ($integration->line_webhook_path ?? '')) }}</textarea>
                         <button type="button"
                                 onclick="navigator.clipboard.writeText(@json($webhookUrl ?: ($integration->line_webhook_path ?? '')));"
                                 class="shrink-0 rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-slate-800 transition">
@@ -98,25 +98,25 @@
                         </button>
                     </div>
                     <p class="text-xs text-slate-500 mt-3">
-                        ใน n8n ให้สร้าง Workflow ที่มี Webhook node และตั้ง Path ให้ตรงกับท้าย URL นี้
+                        In n8n, create a workflow with a Webhook node whose path matches the end of this URL.
                     </p>
                 </div>
 
                 <div class="bg-white border border-slate-200 rounded-xl p-5">
                     <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">LINE OA Channel Access Token (Optional)</p>
                     <p class="text-sm text-slate-600 mb-4">
-                        ไม่จำเป็น ถ้าเรา “ไม่ได้” ส่งข้อความออกจาก FlowCRM เอง (กรณีนี้ให้ n8n จัดการส่ง/ตอบกลับได้)
-                        แต่ถ้าอนาคตต้องการให้ FlowCRM ส่งข้อความผ่าน Messaging API ให้กรอกไว้ได้
+                        Not required if FlowCRM does not send LINE messages (let n8n handle send/reply).
+                        If you later want FlowCRM to send via Messaging API, save the token here.
                     </p>
 
                     <form method="POST" action="{{ route('integrations.n8n.line-token') }}" class="space-y-3">
                         @csrf
                         <textarea name="line_channel_access_token"
                                   class="w-full min-h-[90px] rounded-xl border border-slate-200 p-3 font-mono text-xs"
-                                  placeholder="ใส่ Channel Access Token (ยาวมาก) หรือเว้นว่างไว้"></textarea>
+                                  placeholder="Paste Channel Access Token (long) or leave blank"></textarea>
                         <div class="flex items-center justify-between gap-4">
                             <p class="text-xs text-slate-500">
-                                สถานะ: {{ $lineTokenPresent ? 'ตั้งค่าแล้ว' : 'ยังไม่ตั้งค่า' }}
+                                Status: {{ $lineTokenPresent ? 'Configured' : 'Not set' }}
                             </p>
                             <button type="submit"
                                     class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-slate-800 transition">
@@ -129,7 +129,7 @@
                 <div class="pt-2">
                     <a href="{{ route('teams.index') }}"
                        class="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white hover:bg-emerald-700 transition">
-                        ไปจัดการทีม &rarr;
+                        Manage teams &rarr;
                     </a>
                 </div>
             </div>

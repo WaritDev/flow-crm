@@ -21,9 +21,9 @@ jobs:
         if: always()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          title: "🔔 มีการเคลื่อนไหวที่ Repository"
-          
-          # ใช้ Logic: ถ้ามี Commit Message ให้โชว์ (Push) ถ้าไม่มีให้โชว์ Title (PR)
+          title: "🔔 Repository activity"
+
+          # Push: show commit message; PR: show title
           description: |
             **Event:** `${{ github.event_name }}`
             **Repo:** [${{ github.repository }}](${{ github.event.repository.html_url }})
@@ -32,9 +32,9 @@ jobs:
             **Message:** `${{ github.event.head_commit.message || github.event.pull_request.title }}`
             **Status:** ${{ job.status }}
             
-            ${{ github.event_name == 'pull_request' && format('[👉 ไปที่ Pull Request]({0})', github.event.pull_request.html_url) || '' }}
+            ${{ github.event_name == 'pull_request' && format('[Open Pull Request]({0})', github.event.pull_request.html_url) || '' }}
 
-          # เขียว=ผ่าน, แดง=พัง, เหลือง=ยกเลิก
+          # Green=success, Red=failure, Yellow=cancelled
           color: ${{ job.status == 'success' && '0x28a745' || job.status == 'failure' && '0xdc3545' || '0xffc107' }}
           username: GitHub Bot
           avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png

@@ -41,7 +41,7 @@ class ManagerDashboardSeeder extends Seeder
                 ],
                 [
                     'amount' => rand(4500000, 6000000),
-                    'description' => 'เป้าหมายรายได้รวมบริษัทเดือน '.$date->format('M Y'),
+                    'description' => 'Organization revenue target — '.$date->format('M Y'),
                 ]
             );
         }
@@ -66,7 +66,7 @@ class ManagerDashboardSeeder extends Seeder
         if (! $lost) {
             $lost = PipelineStage::create([
                 'template_id' => $template->id,
-                'name' => 'สูญเสีย (Lost)',
+                'name' => 'Closed lost',
                 'position' => $template->stages->max('position') + 1,
                 'is_won' => false,
             ]);
@@ -123,7 +123,7 @@ class ManagerDashboardSeeder extends Seeder
                     ],
                     [
                         'amount' => rand(800000, 1500000),
-                        'description' => 'เป้าหมายยอดขายส่วนบุคคลเดือน '.$date->format('M Y'),
+                        'description' => 'Individual sales target — '.$date->format('M Y'),
                     ]
                 );
             }
@@ -149,7 +149,11 @@ class ManagerDashboardSeeder extends Seeder
                     $isWon = $randomStage->is_won;
                     $dealDate = Carbon::now()->subDays(rand(0, 180));
                     $wonAt = $isWon ? $dealDate->copy()->addDays(rand(5, 30)) : null;
-                    $lostAt = $randomStage->name === 'สูญเสีย (Lost)' ? $dealDate->copy()->addDays(rand(5, 30)) : null;
+                    $stageName = (string) $randomStage->name;
+                    $sn = mb_strtolower($stageName);
+                    $isLostStage = (str_contains($sn, 'lost') && ! str_contains($sn, 'won'))
+                        || str_contains($stageName, 'สูญเสีย');
+                    $lostAt = $isLostStage ? $dealDate->copy()->addDays(rand(5, 30)) : null;
 
                     $bucket = rand(0, 2); // 0 overdue, 1 today, 2 future
                     $timeHour = rand(9, 17);
@@ -160,21 +164,17 @@ class ManagerDashboardSeeder extends Seeder
                         default => $todayStart->copy()->addDays(rand(1, 5)),
                     };
                     $nextActionDate = $nextActionDate->setTime($timeHour, 0, 0);
-                    $nextAction = 'ทักเพื่อขอข้อมูลเพิ่มเติมทาง LINE';
-                    $stageName = $randomStage->name;
-                    if (str_contains($stageName, 'สนใจ')) {
-                        $nextAction = 'ทักเพื่อขอข้อมูลเพิ่มเติมทาง LINE';
-                    } elseif (str_contains($stageName, 'ติดต่อแล้ว')) {
-                        $nextAction = 'นัดหมายเพื่อคุยรายละเอียดให้ชัดเจน';
-                    } elseif (str_contains($stageName, 'เสนอราคา')) {
-                        $nextAction = 'ส่งใบเสนอราคาและถามความคืบหน้าผ่าน LINE';
-                    } elseif (str_contains($stageName, 'เจรจา')) {
-                        $nextAction = 'ต่อรองราคา/เงื่อนไขและขอเอกสารเพิ่มเติม';
-                    } elseif (str_contains($stageName, 'ปิดการขาย')) {
-                        $nextAction = 'ยืนยันการเซ็นสัญญาและขั้นตอนถัดไป';
-                    } elseif (str_contains($stageName, 'สูญเสีย') || str_contains(mb_strtolower($stageName), 'lost')) {
-                        $nextAction = 'ติดตามผลหลังดีลจบ';
-                    }
+                    $nextAction = match (true) {
+                        $isLostStage => 'Review closed-lost and log learnings',
+                        str_contains($sn, 'won') => 'Confirm contract and handoff',
+                        str_contains($sn, 'negotiation') || str_contains($sn, 'commercial') => 'Align on price, terms, and paperwork',
+                        str_contains($sn, 'proposal') || str_contains($sn, 'quoted') || str_contains($sn, 'quote') => 'Send proposal and confirm next step on LINE',
+                        str_contains($sn, 'demo') || str_contains($sn, 'pilot') => 'Schedule demo and capture feedback',
+                        str_contains($sn, 'discovery') || str_contains($sn, 'qualif') => 'Book discovery / qualification call',
+                        str_contains($sn, 'contact') => 'Schedule a detail call',
+                        str_contains($sn, 'prospect') || str_contains($sn, 'lead') || str_contains($sn, 'inbound') => 'Reach out on LINE for context',
+                        default => 'Plan the next touchpoint',
+                    };
 
                     $deal = Deal::create([
                         'organization_id' => $org->id,

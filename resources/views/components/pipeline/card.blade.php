@@ -9,7 +9,7 @@
         @if($deal->customer && $deal->customer->organization)
             <p class="text-sm text-slate-500">({{ $deal->customer->organization->name }})</p>
         @endif
-        <p class="text-emerald-500 font-bold mt-1">฿ {{ number_format($deal->value) }}</p>
+        <p class="text-emerald-500 font-bold mt-1">THB {{ number_format($deal->value) }}</p>
     </div>
 
     @php
@@ -23,9 +23,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                ไม่มี Next Action!
+                No next action
             </div>
-            <p class="text-slate-800 font-medium text-sm">กำหนดกิจกรรมด่วน</p>
+            <p class="text-slate-800 font-medium text-sm">Add a next step</p>
         </div>
     @elseif($deal->isStale() && $hasPlannedNextAction)
         <div class="bg-amber-50 p-3 rounded-lg border border-amber-200 mb-3">
@@ -34,37 +34,37 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                Next Action เลยกำหนดแล้ว
+                Next action overdue
             </div>
-            <p class="text-xs text-amber-900/70 mb-1">สิ่งที่ต้องทำต่อ:</p>
-            <p class="text-slate-800 font-medium text-sm">{{ $nextActionLabel !== '' ? $nextActionLabel : 'รอดำเนินการ' }}</p>
+            <p class="text-xs text-amber-900/70 mb-1">Next step:</p>
+            <p class="text-slate-800 font-medium text-sm">{{ $nextActionLabel !== '' ? $nextActionLabel : 'Pending' }}</p>
             <div class="flex items-center gap-1 mt-2 text-xs text-amber-900/70">
                 <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                ครบกำหนด: {{ $deal->next_action_date ? $deal->next_action_date->format('d M Y') : '-' }}
+                Due: {{ $deal->next_action_date ? $deal->next_action_date->format('d M Y') : '-' }}
             </div>
         </div>
     @else
         <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3">
             <p class="text-xs text-slate-400 mb-1">Next Step:</p>
-            <p class="text-slate-800 font-medium text-sm">{{ $deal->next_action ?? 'รอดำเนินการ' }}</p>
+            <p class="text-slate-800 font-medium text-sm">{{ $deal->next_action ?? 'Pending' }}</p>
             <div class="flex items-center gap-1 mt-2 text-xs text-slate-400">
                 <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                ครบกำหนด Next Action: {{ $deal->next_action_date ? $deal->next_action_date->format('d M Y') : '-' }}
+                Next action due: {{ $deal->next_action_date ? $deal->next_action_date->format('d M Y') : '-' }}
             </div>
             @if($deal->expected_close_date)
-                <p class="text-xs text-slate-400 mt-2">ปิดดีลคาดหมาย: {{ $deal->expected_close_date->format('d M Y') }}</p>
+                <p class="text-xs text-slate-400 mt-2">Expected close: {{ $deal->expected_close_date->format('d M Y') }}</p>
             @endif
         </div>
     @endif
 
     <div class="flex justify-between items-end">
-        <span class="text-xs text-slate-400">{{ $deal->updated_at->diffInDays(now()) }} วันใน Stage นี้</span>
+        <span class="text-xs text-slate-400">{{ $deal->updated_at->diffInDays(now()) }} days in this stage</span>
 
         <a href="#"
            class="flex items-center gap-1 text-emerald-500 hover:text-emerald-600 font-medium text-sm px-2 py-1 rounded hover:bg-emerald-50 transition-colors">

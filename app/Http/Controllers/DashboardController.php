@@ -58,7 +58,9 @@ class DashboardController extends Controller
             $growth = $lastMonthRev > 0 ? round((($thisMonthRev - $lastMonthRev) / $lastMonthRev) * 100, 1) : 0;
             
             $activeDealsQuery = Deal::where('organization_id', $orgId)
-                                    ->whereHas('stage', fn($q) => $q->where('is_won', false)->where('name', '!=', 'สูญเสีย (Lost)'));
+                ->whereHas('stage', fn ($q) => $q->where('is_won', false)
+                    ->whereRaw('LOWER(COALESCE(name, "")) NOT LIKE ?', ['%lost%'])
+                    ->where('name', 'not like', '%สูญเสีย%'));
             
             $activeDealsCount = $activeDealsQuery->count();
             $activeDealsValue = $activeDealsQuery->sum('value');
@@ -196,13 +198,13 @@ class DashboardController extends Controller
             'revenue_growth' => 12, // %
         ];
 
-        // 2. Mock Daily Activities (กิจกรรมที่ต้องทำวันนี้)
+        // 2. Mock daily activities
         $activities = [
             [
                 'id' => 1,
-                'action_type' => 'ทัก LINE',
-                'customer_name' => 'คุณสมชาย',
-                'description' => 'ส่งใบเสนอราคาบริการ Spa Package',
+                'action_type' => 'LINE',
+                'customer_name' => 'Somchai K.',
+                'description' => 'Send Spa package quote',
                 'priority' => 'urgent', // urgent, medium, normal
                 'time' => '10:00',
                 'status' => 'pending'
@@ -210,35 +212,35 @@ class DashboardController extends Controller
             [
                 'id' => 2,
                 'action_type' => 'Follow-up',
-                'customer_name' => 'คุณนก',
-                'description' => 'นัดนวดหน้า Facial Treatment',
+                'customer_name' => 'Nok S.',
+                'description' => 'Book facial treatment appointment',
                 'priority' => 'urgent',
                 'time' => '11:30',
                 'status' => 'pending'
             ],
             [
                 'id' => 3,
-                'action_type' => 'ทัก LINE',
-                'customer_name' => 'คุณวิภา',
-                'description' => 'แจ้งสินค้าพร้อมส่ง',
+                'action_type' => 'LINE',
+                'customer_name' => 'Wipha R.',
+                'description' => 'Notify product ready to ship',
                 'priority' => 'medium',
                 'time' => '14:00',
                 'status' => 'pending'
             ],
             [
                 'id' => 4,
-                'action_type' => 'ปิดการขาย',
-                'customer_name' => 'คุณมานพ',
-                'description' => 'ยืนยันออเดอร์และรับชำระเงิน',
+                'action_type' => 'Close deal',
+                'customer_name' => 'Manop T.',
+                'description' => 'Confirm order and collect payment',
                 'priority' => 'normal',
                 'time' => '16:00',
                 'status' => 'pending'
             ],
         ];
 
-        // 3. Mock Chart Data (Revenue Snapshot)
+        // 3. Mock chart data (revenue snapshot)
         $chartData = [
-            'labels' => ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.'],
+            'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
             'data' => [120000, 150000, 220000, 310000, 280000, 390000, 420000],
             'projected' => [120000, 155000, 230000, 320000, 350000, 410000, 450000]
         ];

@@ -61,7 +61,7 @@ class RegisteredUserController extends Controller
 
             $team = Team::create([
                 'organization_id' => $createdOrg->id,
-                'name' => 'ทีมขายหลัก',
+                'name' => 'Primary sales team',
                 'template_id' => $defaultTemplateId,
             ]);
             $managerTeamId = $team->id;

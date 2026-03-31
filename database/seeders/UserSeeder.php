@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'admin@flowcrm.com'],
             [
-                'name' => 'ผู้ดูแลระบบ',
+                'name' => 'System Admin',
                 'password' => bcrypt('password'),
                 'role' => 'admin',
             ]

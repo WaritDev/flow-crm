@@ -29,7 +29,7 @@
             <span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full text-xs font-semibold">{{ $count }}</span>
         </div>
         <div class="text-sm font-semibold text-slate-400">
-            ฿{{ number_format($totalAmount) > 0 ? number_format($totalAmount / 1000) . 'k' : '0' }}
+            THB {{ number_format($totalAmount) > 0 ? number_format($totalAmount / 1000) . 'k' : '0' }}
         </div>
     </div>
 
@@ -44,7 +44,7 @@
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
-            เพิ่มดีล
+            Add deal
         </button>
     </div>
 </div>

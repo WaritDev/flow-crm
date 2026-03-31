@@ -63,12 +63,12 @@
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
             <h3 class="text-lg font-bold text-slate-800">Integrations (Admin)</h3>
             <p class="text-sm text-slate-500 mt-1">
-                ตั้งค่า n8n token และ LINE OA webhook ขององค์กรนี้
+                Configure the n8n API token and LINE OA webhook for this organization.
             </p>
 
             @if(session('n8n_plain_text_token'))
                 <div class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-                    <p class="text-sm font-semibold text-emerald-800">n8n token ใหม่ (แสดงครั้งเดียว)</p>
+                    <p class="text-sm font-semibold text-emerald-800">New n8n token (shown once)</p>
                     <div class="mt-2 flex items-start gap-3">
                         <textarea readonly class="w-full min-h-[80px] rounded-xl border border-emerald-200 bg-white p-3 font-mono text-xs">{{ session('n8n_plain_text_token') }}</textarea>
                         <button type="button"
@@ -108,7 +108,7 @@
                         @if($n8nBaseUrl)
                             Webhook URL: <span class="font-mono select-all">{{ $webhookUrl }}</span>
                         @else
-                            ตั้งค่า <span class="font-mono">N8N_URL</span> ใน <span class="font-mono">.env</span> เพื่อให้ระบบสร้างลิงก์เต็ม (รองรับ https/ngrok)
+                            Set <span class="font-mono">N8N_URL</span> in <span class="font-mono">.env</span> so the app can build the full webhook URL (https/ngrok supported).
                         @endif
                     </p>
                 </div>
@@ -125,16 +125,16 @@
                     <label class="block text-sm font-medium text-slate-700 mb-1">LINE OA Channel Access Token (Optional)</label>
                     <textarea name="integration_line_channel_access_token" rows="3"
                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
-                              placeholder="เว้นว่างไว้ได้ (ถ้าให้ n8n เป็นคนส่งข้อความเอง)"></textarea>
+                              placeholder="Optional if n8n sends LINE messages on its own"></textarea>
                     @error('integration_line_channel_access_token') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    <p class="text-xs text-slate-500 mt-2">สถานะ: {{ ($integration->line_channel_access_token_encrypted ?? null) ? 'ตั้งค่าแล้ว' : 'ยังไม่ตั้งค่า' }}</p>
+                    <p class="text-xs text-slate-500 mt-2">Status: {{ ($integration->line_channel_access_token_encrypted ?? null) ? 'Configured' : 'Not set' }}</p>
                 </div>
 
                 <div class="flex items-center gap-2">
                     <input id="integration_rotate_n8n_token" type="checkbox" name="integration_rotate_n8n_token" value="1"
                            class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
                     <label for="integration_rotate_n8n_token" class="text-sm text-slate-700">
-                        Rotate n8n token (สร้างใหม่และยกเลิกของเดิม)
+                        Rotate n8n token (issue new, revoke old)
                     </label>
                 </div>
 

@@ -9,7 +9,7 @@
             <h1 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
                 Sales Dashboard
             </h1>
-            <p class="text-slate-500 mt-1">นี่คือภาพรวมกิจกรรมของคุณวันนี้</p>
+            <p class="text-slate-500 mt-1">Here is your activity overview for today.</p>
             @if (auth()->user()->isManager())
                 <div class="flex bg-slate-100 p-1 rounded-lg">
                     <span
@@ -22,21 +22,21 @@
 
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <x-dashboard.stat-card title="ต้องทำวันนี้" value="{{ $stats['todo_today'] }}" color="rose">
+            <x-dashboard.stat-card title="Due today" value="{{ $stats['todo_today'] }}" color="rose">
                 <svg class="w-6 h-6 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </x-dashboard.stat-card>
 
-            <x-dashboard.stat-card title="ดีลค้างเกิน 3 วัน" value="{{ $stats['overdue_deals'] }}" color="amber">
+            <x-dashboard.stat-card title="Deals idle 3+ days" value="{{ $stats['overdue_deals'] }}" color="amber">
                 <svg class="w-6 h-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>
             </x-dashboard.stat-card>
 
-            <x-dashboard.stat-card title="ลูกค้ายืนยันใบเสนอราคา" value="{{ $stats['confirmed_quotes'] }}"
+            <x-dashboard.stat-card title="Quotes confirmed" value="{{ $stats['confirmed_quotes'] }}"
                                    color="emerald">
                 <svg class="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -44,7 +44,7 @@
                 </svg>
             </x-dashboard.stat-card>
 
-            <x-dashboard.stat-card title="Revenue เดือนนี้" value="฿{{ number_format($stats['revenue_month']/1000) }}K"
+            <x-dashboard.stat-card title="Revenue (MTD)" value="THB {{ number_format($stats['revenue_month']/1000) }}K"
                                    color="slate" trend="{{ $stats['revenue_growth'] }}%">
                 <svg class="w-6 h-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -59,8 +59,8 @@
 
                 <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                     <div class="p-4 border-b border-slate-100 flex items-center justify-between">
-                        <h2 class="font-bold text-slate-800">กิจกรรมที่ต้องทำวันนี้</h2>
-                        <span class="bg-slate-100 text-slate-500 text-xs px-2 py-1 rounded font-bold">{{ count($activities) }} รายการ</span>
+                        <h2 class="font-bold text-slate-800">Activities due today</h2>
+                        <span class="bg-slate-100 text-slate-500 text-xs px-2 py-1 rounded font-bold">{{ count($activities) }} items</span>
                     </div>
                     <div class="divide-y divide-slate-50">
                         @foreach($activities as $activity)
@@ -73,13 +73,13 @@
                     <div class="flex items-center justify-between mb-4">
                         <div>
                             <h2 class="font-bold text-slate-800">Revenue Snapshot</h2>
-                            <p class="text-xs text-slate-400">ยอดขายจริง vs คาดการณ์</p>
+                            <p class="text-xs text-slate-400">Actual vs projected</p>
                         </div>
                         <div class="flex gap-3 text-xs">
                             <span class="flex items-center gap-1"><span
-                                    class="w-2 h-2 rounded-full bg-emerald-500"></span> ยอดจริง</span>
+                                    class="w-2 h-2 rounded-full bg-emerald-500"></span> Actual</span>
                             <span class="flex items-center gap-1"><span
-                                    class="w-2 h-2 rounded-full bg-slate-300"></span> คาดการณ์</span>
+                                    class="w-2 h-2 rounded-full bg-slate-300"></span> Projected</span>
                         </div>
                     </div>
                     <div class="relative h-64 w-full">
@@ -101,13 +101,13 @@
                             </svg>
                         </div>
                         <div>
-                            <h3 class="font-bold text-slate-800">เป้าหมายวันนี้</h3>
-                            <p class="text-xs text-slate-500">ทำไปแล้ว 8 จาก 18 กิจกรรม</p>
+                            <h3 class="font-bold text-slate-800">Today's goal</h3>
+                            <p class="text-xs text-slate-500">8 of 18 activities done (demo)</p>
                         </div>
                     </div>
 
                     <div class="mb-2 flex justify-between text-sm">
-                        <span class="font-bold text-slate-700">44% สำเร็จ</span>
+                        <span class="font-bold text-slate-700">44% complete</span>
                     </div>
                     <div class="w-full bg-slate-100 rounded-full h-2.5 mb-6">
                         <div class="bg-emerald-500 h-2.5 rounded-full" style="width: 44%"></div>
@@ -117,7 +117,7 @@
                         <div class="bg-slate-50 rounded-xl p-3 text-center">
                             <h4 class="text-lg font-bold text-slate-800">5<span
                                     class="text-xs text-slate-400 font-normal">/10</span></h4>
-                            <p class="text-[10px] text-slate-500">ทัก LINE</p>
+                            <p class="text-[10px] text-slate-500">LINE</p>
                             <div class="w-full bg-slate-200 h-1 mt-2 rounded-full">
                                 <div class="bg-emerald-500 h-1 rounded-full" style="width: 50%"></div>
                             </div>
@@ -125,7 +125,7 @@
                         <div class="bg-slate-50 rounded-xl p-3 text-center">
                             <h4 class="text-lg font-bold text-slate-800">2<span
                                     class="text-xs text-slate-400 font-normal">/5</span></h4>
-                            <p class="text-[10px] text-slate-500">โทร</p>
+                            <p class="text-[10px] text-slate-500">Calls</p>
                             <div class="w-full bg-slate-200 h-1 mt-2 rounded-full">
                                 <div class="bg-emerald-500 h-1 rounded-full" style="width: 40%"></div>
                             </div>
@@ -133,7 +133,7 @@
                         <div class="bg-slate-50 rounded-xl p-3 text-center">
                             <h4 class="text-lg font-bold text-slate-800">1<span
                                     class="text-xs text-slate-400 font-normal">/3</span></h4>
-                            <p class="text-[10px] text-slate-500">ปิดดีล</p>
+                            <p class="text-[10px] text-slate-500">Close deals</p>
                             <div class="w-full bg-slate-200 h-1 mt-2 rounded-full">
                                 <div class="bg-emerald-500 h-1 rounded-full" style="width: 33%"></div>
                             </div>
@@ -150,7 +150,7 @@
                     </div>
                     <div>
                         <h3 class="text-2xl font-bold text-slate-800">156</h3>
-                        <p class="text-xs text-slate-500">ลูกค้าทั้งหมด</p>
+                        <p class="text-xs text-slate-500">Total customers</p>
                     </div>
                 </div>
 
@@ -163,7 +163,7 @@
                     </div>
                     <div>
                         <h3 class="text-2xl font-bold text-slate-800">89</h3>
-                        <p class="text-xs text-slate-500">ข้อความส่งเดือนนี้</p>
+                        <p class="text-xs text-slate-500">Messages sent (MTD)</p>
                     </div>
                 </div>
 
@@ -173,11 +173,11 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
-                        สัญญาณเตือน
+                        Heads-up
                     </div>
-                    <p class="text-sm text-slate-600 mb-3">ลูกค้า 3 รายเงียบไป 48 ชม.</p>
+                    <p class="text-sm text-slate-600 mb-3">3 customers quiet for 48h (demo).</p>
                     <a href="#" class="text-emerald-600 text-sm font-bold flex items-center gap-1 hover:underline">
-                        ดูคำแนะนำ
+                        View suggestions
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M17 8l4 4m0 0l-4 4m4-4H3"/>
@@ -204,7 +204,7 @@
                 labels: @json($chartData['labels']),
                 datasets: [
                     {
-                        label: 'คาดการณ์',
+                        label: 'Projected',
                         data: @json($chartData['projected']),
                         borderColor: '#cbd5e1', // Slate-300
                         borderDash: [5, 5],
@@ -214,7 +214,7 @@
                         fill: false
                     },
                     {
-                        label: 'ยอดจริง',
+                        label: 'Actual',
                         data: @json($chartData['data']),
                         borderColor: '#10b981', // Emerald-500
                         backgroundColor: gradientReal,
@@ -240,7 +240,7 @@
                         displayColors: false,
                         callbacks: {
                             label: function (context) {
-                                return '฿' + context.parsed.y.toLocaleString();
+                                return 'THB ' + context.parsed.y.toLocaleString();
                             }
                         }
                     }

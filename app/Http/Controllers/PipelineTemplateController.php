@@ -51,7 +51,7 @@ class PipelineTemplateController extends Controller
 
         return redirect()
             ->route('pipeline-templates.index')
-            ->with('success', 'กำหนด Pipeline template ให้ทีม «'.$team->name.'» แล้ว');
+            ->with('success', 'Pipeline template assigned to team «'.$team->name.'».');
     }
 
     public function create(): View
@@ -101,7 +101,7 @@ class PipelineTemplateController extends Controller
 
         return redirect()
             ->route('pipeline-templates.index')
-            ->with('success', 'สร้าง Pipeline template ขององค์กรแล้ว');
+            ->with('success', 'Organization pipeline template created.');
     }
 
     public function show(Request $request, PipelineTemplate $pipeline_template): View
@@ -132,7 +132,7 @@ class PipelineTemplateController extends Controller
         abort_unless($user->isManager() && $user->organization_id, 403);
 
         if ($pipeline_template->isSystemTemplate()) {
-            abort(403, 'แก้ไขเทมเพลตระบบจากที่นี่ไม่ได้');
+            abort(403, 'System templates cannot be edited here.');
         }
         if ((int) $pipeline_template->organization_id !== (int) $user->organization_id) {
             abort(403);
@@ -188,7 +188,7 @@ class PipelineTemplateController extends Controller
 
         return redirect()
             ->route('pipeline-templates.index')
-            ->with('success', 'บันทึกการแก้ไข template แล้ว');
+            ->with('success', 'Template saved.');
     }
 
     public function destroy(Request $request, PipelineTemplate $pipeline_template)
@@ -200,6 +200,6 @@ class PipelineTemplateController extends Controller
 
         return redirect()
             ->route('pipeline-templates.index')
-            ->with('success', 'ลบ template แล้ว');
+            ->with('success', 'Template deleted.');
     }
 }

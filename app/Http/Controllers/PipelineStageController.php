@@ -90,7 +90,7 @@ class PipelineStageController extends Controller
             'description' => $request->input('description'),
         ]);
 
-        return redirect()->route('pipeline-stages.index')->with('success', 'สร้าง Stage เรียบร้อยแล้ว');
+        return redirect()->route('pipeline-stages.index')->with('success', 'Stage created.');
     }
 
     /**

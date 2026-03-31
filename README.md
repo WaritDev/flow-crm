@@ -1,46 +1,42 @@
-# FlowCRM: An Action-Driven CRM for Thai SMEs
+# FlowCRM — action-driven CRM (Laravel backend)
 
-**FlowCRM** เป็นระบบบริหารจัดการความสัมพันธ์ลูกค้าที่ออกแบบภายใต้ปรัชญา **"สั่งการ มากกว่า บันทึก"** เพื่อแก้ปัญหาหลักของ SME ไทย เช่น ความเหนื่อยล้าจากการป้อนข้อมูล (Data Entry Fatigue) และช่องว่างของการไม่ปฏิบัติงาน (Inaction Gap)  โดยเปลี่ยนฐานข้อมูลให้กลายเป็นระบบนำทางกิจกรรมรายวัน (Action Stream) ที่เชื่อมต่อกับพฤติกรรมการขายผ่าน LINE OA เป็นหลัก 
+**FlowCRM** is a customer relationship tool built around **“direct action, not just logging”**: it reduces data-entry fatigue and the gap between records and follow-up. The database feeds a daily **action stream** tied to how reps work on **LINE OA**.
 
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-## About The Project
+## About the project
 
-FlowCRM พัฒนาขึ้นโดยใช้เฟรมเวิร์ก Laravel ซึ่งเป็นเว็บแอปพลิเคชันเฟรมเวิร์กที่มีไวยากรณ์ที่แสดงออกถึงความหมายและสง่างาม เราเชื่อว่าการพัฒนาต้องเป็นประสบการณ์ที่สนุกสนานและสร้างสรรค์ Laravel ช่วยลดความยุ่งยากในงานทั่วไป เช่น:
+The backend is **Laravel**, with APIs and Blade views for managers/admins. See the official Laravel docs for routing, Eloquent, migrations, and broadcasting.
 
--(https://laravel.com/docs/routing)
+## System architecture
 
-* [Powerful dependency injection container](https://laravel.com/docs/container)
--([https://laravel.com/docs/eloquent](https://laravel.com/docs/eloquent))
--([https://laravel.com/docs/migrations](https://laravel.com/docs/migrations))
--([https://laravel.com/docs/broadcasting](https://laravel.com/docs/broadcasting))
+Designed for **multi-tenant SaaS** and **event-driven** workflows:
 
-## System Architecture (สถาปัตยกรรมระบบ)
-
-ระบบถูกออกแบบมาให้รองรับการขยายตัวแบบ Multi-tenant SaaS และทำงานแบบ Event-Driven :
-
-* **Front-end (Sales):** SvelteKit + Vite + Tailwind (repo `flow-crm-frontend`)
-* **Back-end:** Laravel (API + Blade) จัดการ Business Logic และการแยกข้อมูลตามองค์กร
-* **Workflow Engine:** **n8n** ทำหน้าที่เป็นสมองกลคอยรับ Webhook จาก LINE OA และแปลงสัญญาณพฤติกรรมลูกค้าให้กลายเป็นกิจกรรมในระบบอัตโนมัติ 
-
-
-* **Data Layer:** MySQL (ผ่าน Laravel Sail ในโหมดพัฒนา)
-* **Services:** Docker (Sail) — MySQL, Redis, Mailpit
+* **Front-end (Sales):** SvelteKit + Vite + Tailwind (`flow-crm-frontend` / `develop/flow-crm-frontend`)
+* **Back-end:** Laravel (API + Blade) — business logic and per-organization data
+* **Workflow engine:** **n8n** — LINE OA webhooks and automation
+* **Data:** MySQL (via Laravel Sail in development)
+* **Services (Sail):** MySQL, Redis, Mailpit
 
 ---
 
-## Quick Start — รัน Backend (Laravel Sail)
+## Quick start (Laravel Sail)
 
-1. **โคลน repo**
+1. **Clone the repo**
+
    ```bash
-   git clone <url-ของ-repo-นี้>.git
+   git clone <repository-url>.git
    cd flow-crm-backend
    ```
-2. **ตั้งค่า `.env`**
+
+2. **Configure `.env`**
+
    ```bash
    cp .env.example .env
    ```
-3. **ติดตั้ง dependency PHP (Composer)**
+
+3. **Install PHP dependencies (Composer)**
+
    ```bash
    docker run --rm \
      -u "$(id -u):$(id -g)" \
@@ -49,21 +45,27 @@ FlowCRM พัฒนาขึ้นโดยใช้เฟรมเวิร์
      composer:latest \
      composer install --ignore-platform-reqs
    ```
-   *หรือรัน `composer install` ในโฟลเดอร์โปรเจกต์ถ้ามี PHP/ Composer บนเครื่องแล้ว*
-4. **ขึ้น container (MySQL, Redis, Mailpit, app)**
+
+   Or run `composer install` locally if PHP/Composer are installed.
+
+4. **Start containers (MySQL, Redis, Mailpit, app)**
+
    ```bash
    ./vendor/bin/sail up -d
    ```
-5. **สร้าง key และฐานข้อมูล + seed ตัวอย่าง**
+
+5. **App key, migrations, and sample data**
+
    ```bash
    ./vendor/bin/sail artisan key:generate
    ./vendor/bin/sail artisan migrate --seed
    ```
-6. **เปิดเว็บ** — โดยค่าเริ่มต้น `http://localhost` (พอร์ต 80 ตาม `APP_PORT` ใน `.env`)
 
-### ค่า `.env` ที่ควรตรงกับ Sail (MySQL)
+6. **Open the app** — default `http://localhost` (port from `APP_PORT` in `.env`).
 
-ถ้าใช้ `compose.yaml` ของ Sail ให้กำหนดประมาณนี้ (ดูรายละเอียดเต็มใน `.env.example`):
+### `.env` aligned with Sail (MySQL)
+
+If you use Sail’s `compose.yaml`, set values similar to below (full list in `.env.example`):
 
 ```env
 APP_URL=http://localhost
@@ -81,64 +83,48 @@ MAIL_PORT=1025
 REDIS_HOST=redis
 ```
 
-### 3. Install Dependencies & Application Initialization
-ติดตั้งคอมโพเนนต์ที่จำเป็น, ตั้งค่ากุญแจความปลอดภัย และเตรียมฐานข้อมูลพร้อมข้อมูลตัวอย่าง (Seeder):
-- **Mailpit UI:** `http://localhost:8025` (ตาม `FORWARD_MAILPIT_DASHBOARD_PORT`)
-- **ผู้จัดการลงทะเบียน:** `http://localhost/register`  
-- **Sales สมัคร:** ผ่านแอป frontend `/register` ด้วยรหัสเชิญองค์กร
+### Initialize / refresh database
 
-รันคำสั่ง artisan ซ้ำๆ: `./vendor/bin/sail artisan ...`  
-หยุด: `./vendor/bin/sail down`
+```bash
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate:refresh --seed
+```
+
+* **Mailpit UI:** `http://localhost:8025` (see `FORWARD_MAILPIT_DASHBOARD_PORT`)
+* **Manager registration:** `http://localhost/register`
+* **Sales signup:** frontend `/register` with organization invite code
+
+Stop containers: `./vendor/bin/sail down`
 
 ### Prerequisites
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-# สร้าง APP_KEY
-./vendor/bin/sail artisan key:generate
-
-# Migration พร้อม Seed ข้อมูลตัวอย่าง (Manager, sales, Templates, Deals)
-./vendor/bin/sail artisan migrate:refresh --seed
-
-```
-
-### 4. Start Services
+### Optional: Sail + front-end dev
 
 ```bash
-
-# ติดตั้ง Front-end Dependencies และรัน Dev Server
-
 ./vendor/bin/sail yarn install
 ./vendor/bin/sail yarn dev
-
 ```
 
-## Access Information (ข้อมูลการเข้าใช้งาน)
+## Access (sample credentials)
 
-เมื่อรันระบบเสร็จสิ้น สามารถเข้าใช้งานได้ที่: `http://localhost` สำหรับ Role Manager และ Admin
-
-**บัญชีสำหรับทดสอบ (Default Credentials):**
+After seeding:
 
 * **Admin:** `admin@flowcrm.com` / `password`
-* **Manager-Org1:** `manager@org1.com` / `password`
-* **Manager-Org2:** `manager@org2.com` / `password`
+* **Manager org1:** `manager@org1.com` / `password`
+* **Manager org2:** `manager@org2.com` / `password`
 * **Sales:** `sales1@org1.com` / `password`
 * **Sales:** `sales1@org2.com` / `password`
 
-แอป Sales (SvelteKit) และ workflow **n8n** — ดู `flow-crm-frontend/README.md` และ `flow-crm-n8n/README.md`
+Sales app (SvelteKit) and **n8n**: see `flow-crm-frontend/README.md` and `flow-crm-n8n/README.md`.
 
-## Key Features for Demo
+## Key features (demo)
 
-* **Action Stream:** ดูรายการงานที่ระบบสั่งการให้ทำในแต่ละวัน 
-
-
-* **Sales Pipeline:** กระดาน Kanban แบบ Sequential ที่เน้นความต่อเนื่องของดีล 
-
-
-* **LINE Integration:** ปุ่ม Copy Script และ Deep Link เพื่อเปิดห้องแชทลูกค้าทันที 
-
-
+* **Action stream** — prioritized tasks per day
+* **Sales pipeline** — Kanban-style stages
+* **LINE** — copy scripts and deep links to chat
 
 ## License
 
-The FlowCRM project is open-sourced software licensed under the([https://opensource.org/licenses/MIT](https://opensource.org/licenses/MIT)).
+Open-source under the [MIT License](https://opensource.org/licenses/MIT).

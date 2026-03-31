@@ -71,19 +71,19 @@ class SalesDashboardController extends Controller
                 };
 
                 $priorityLabel = match ($priorityKey) {
-                    'urgent' => 'ด่วน',
-                    'medium' => 'ปานกลาง',
-                    default => 'ปกติ',
+                    'urgent' => 'Urgent',
+                    'medium' => 'Medium',
+                    default => 'Normal',
                 };
 
                 $actionType = match ($a->activity_type) {
-                    'call' => 'โทร',
-                    'message' => 'ข้อความ',
-                    'line' => 'ทัก LINE',
-                    'meeting' => 'ประชุม',
-                    'email' => 'อีเมล',
-                    'note' => 'โน้ต',
-                    'task' => 'งานต่อไป',
+                    'call' => 'Call',
+                    'message' => 'Message',
+                    'line' => 'LINE',
+                    'meeting' => 'Meeting',
+                    'email' => 'Email',
+                    'note' => 'Note',
+                    'task' => 'Next action',
                     default => 'Task',
                 };
 
@@ -116,7 +116,7 @@ class SalesDashboardController extends Controller
                     'title' => (string) ($a->name ?? ''),
                     'description' => $a->description,
                     'warning' => '',
-                    'time' => 'วันนี้',
+                    'time' => 'Today',
                     'due_date' => $dueDate->toDateString(),
                     'amount' => $amount,
                     'line_id' => $lineId,
@@ -138,8 +138,8 @@ class SalesDashboardController extends Controller
             ->whereNull('won_at')
             ->whereNull('lost_at')
             ->whereHas('stage', function ($q) {
-                $q->whereRaw('LOWER(name) like ?', ['%เสนอราคา%'])
-                    ->orWhereRaw('LOWER(name) like ?', ['%quoted%']);
+                $q->whereRaw('LOWER(name) like ?', ['%quoted%'])
+                    ->orWhereRaw('LOWER(name) like ?', ['%quote%']);
             });
 
         if ($user->role === 'sales') {

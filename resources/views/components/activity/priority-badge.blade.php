@@ -8,13 +8,13 @@
     ];
 
     $labels = [
-        'urgent' => 'ด่วน',
-        'medium' => 'ปานกลาง',
-        'normal' => 'ปกติ',
+        'urgent' => 'Urgent',
+        'medium' => 'Medium',
+        'normal' => 'Normal',
     ];
 
     $style = $styles[$priority] ?? $styles['normal'];
-    $label = $labels[$priority] ?? 'ปกติ';
+    $label = $labels[$priority] ?? 'Normal';
 @endphp
 
 <span class="{{ $style }} ring-1 px-2.5 py-0.5 rounded-full text-xs font-bold inline-block text-center min-w-[50px]">

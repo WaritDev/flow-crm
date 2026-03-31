@@ -3,11 +3,11 @@
 @php
     $ind = strtolower((string) ($template->industry ?? ''));
     $color = 'blue';
-    if (str_contains($ind, 'beauty') || str_contains($ind, 'คลินิก')) $color = 'pink';
-    elseif (str_contains($ind, 'ก่อสร้าง') || str_contains($ind, 'construction')) $color = 'orange';
-    elseif (str_contains($ind, 'pre') || str_contains($ind, 'พรี')) $color = 'purple';
+    if (str_contains($ind, 'beauty') || str_contains($ind, 'clinic')) $color = 'pink';
+    elseif (str_contains($ind, 'construction')) $color = 'orange';
+    elseif (str_contains($ind, 'pre')) $color = 'purple';
     elseif (str_contains($ind, 'b2b')) $color = 'indigo';
-    elseif (str_contains($ind, 'health') || str_contains($ind, 'สุขภาพ')) $color = 'rose';
+    elseif (str_contains($ind, 'health')) $color = 'rose';
 
     $colors = [
         'pink' => ['bg' => 'bg-pink-100', 'text' => 'text-pink-600', 'border' => 'border-pink-200'],
@@ -24,7 +24,7 @@
 <div class="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col h-full hover:shadow-md transition-shadow">
     <div class="flex items-start justify-between gap-2 mb-3">
         <span class="inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-semibold {{ $theme['bg'] }} {{ $theme['text'] }}">
-            {{ $isSystem ? 'ระบบ' : 'ขององค์กร' }}
+            {{ $isSystem ? 'System' : 'Organization' }}
         </span>
         @if($template->is_default)
             <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">Default</span>
@@ -39,7 +39,7 @@
     @if($template->description)
         <p class="text-slate-600 text-sm mt-3 flex-grow leading-relaxed">{{ Str::limit($template->description, 160) }}</p>
     @else
-        <p class="text-slate-400 text-sm mt-3 flex-grow italic">ไม่มีคำอธิบาย</p>
+        <p class="text-slate-400 text-sm mt-3 flex-grow italic">No description</p>
     @endif
 
     <div class="border-t border-slate-100 my-4"></div>
@@ -54,9 +54,9 @@
     </div>
 
     <div class="mt-auto flex flex-col gap-2">
-        <a href="{{ route('pipeline-templates.show', $template) }}" class="text-center text-sm text-slate-600 hover:text-emerald-600 font-medium py-2">ดูรายละเอียด</a>
+        <a href="{{ route('pipeline-templates.show', $template) }}" class="text-center text-sm text-slate-600 hover:text-emerald-600 font-medium py-2">View details</a>
         @if(!$isSystem)
-            <a href="{{ route('pipeline-templates.edit', $template) }}" class="text-center text-sm text-emerald-700 hover:underline font-medium py-1">แก้ไขเทมเพลต</a>
+            <a href="{{ route('pipeline-templates.edit', $template) }}" class="text-center text-sm text-emerald-700 hover:underline font-medium py-1">Edit template</a>
         @endif
     </div>
 </div>
